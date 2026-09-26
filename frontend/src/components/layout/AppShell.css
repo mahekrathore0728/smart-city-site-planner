@@ -1,0 +1,32 @@
+/* AppShell Layout */
+.shell {
+  display: flex;
+  min-height: 100vh;
+  background: var(--bg-base);
+}
+
+.shell-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  margin-left: var(--sidebar-width);
+  transition: margin-left var(--transition-base);
+}
+
+.shell-content {
+  flex: 1;
+  padding: var(--space-8);
+  overflow-y: auto;
+  max-width: 100%;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .shell-main {
+    margin-left: 0;
+  }
+  .shell-content {
+    padding: var(--space-5) var(--space-4);
+  }
+}

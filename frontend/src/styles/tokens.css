@@ -1,0 +1,138 @@
+/* ============================================================
+   SMART CITY SITE PLANNER — Design Tokens
+   Premium SaaS × Urban Planning Studio × GIS Workspace
+   ============================================================ */
+
+:root {
+  /* ── Backgrounds ── */
+  --bg-base: #F7F7F5;
+  --bg-panel: #FFFFFF;
+  --bg-nav: #111111;
+  --bg-nav-hover: #1C1C1C;
+  --bg-nav-active: rgba(37, 99, 235, 0.15);
+  --bg-muted: #F2F2EF;
+  --bg-subtle: #FAFAF8;
+  --bg-overlay: rgba(17, 17, 17, 0.5);
+
+  /* ── Text ── */
+  --text-primary: #111111;
+  --text-secondary: #6B6B6B;
+  --text-tertiary: #9B9B9B;
+  --text-disabled: #C4C4C0;
+  --text-nav: #E5E5E5;
+  --text-nav-muted: #888888;
+  --text-inverse: #FFFFFF;
+  --text-link: #2563EB;
+
+  /* ── Borders ── */
+  --border: #E7E7E4;
+  --border-strong: #D0D0CC;
+  --border-focus: #2563EB;
+  --border-nav: rgba(255,255,255,0.08);
+
+  /* ── Accents ── */
+  --blue: #2563EB;
+  --blue-light: #EFF6FF;
+  --blue-dark: #1D4ED8;
+  --green: #10B981;
+  --green-light: #ECFDF5;
+  --green-dark: #059669;
+  --amber: #F59E0B;
+  --amber-light: #FFFBEB;
+  --red: #EF4444;
+  --red-light: #FEF2F2;
+  --purple: #7C3AED;
+  --purple-light: #F5F3FF;
+  --teal: #0D9488;
+  --teal-light: #F0FDFA;
+
+  /* ── Status / Semantic ── */
+  --status-complete: var(--green);
+  --status-in-progress: var(--blue);
+  --status-pending: var(--text-tertiary);
+  --status-warning: var(--amber);
+  --status-critical: var(--red);
+
+  /* ── Analysis status colors ── */
+  --analysis-not-started: #9B9B9B;
+  --analysis-evidence-required: #F59E0B;
+  --analysis-uploaded: #2563EB;
+  --analysis-reviewed: #10B981;
+
+  /* ── Spacing ── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 28px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+
+  /* ── Typography ── */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  --text-xs: 11px;
+  --text-sm: 12px;
+  --text-base: 13px;
+  --text-md: 14px;
+  --text-lg: 16px;
+  --text-xl: 18px;
+  --text-2xl: 22px;
+  --text-3xl: 28px;
+  --text-4xl: 36px;
+  --text-5xl: 48px;
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  --leading-tight: 1.2;
+  --leading-snug: 1.4;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.6;
+
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.04em;
+  --tracking-wider: 0.08em;
+  --tracking-widest: 0.12em;
+
+  /* ── Border radius ── */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-full: 9999px;
+
+  /* ── Shadows ── */
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 2px 6px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-lg: 0 4px 16px rgba(0,0,0,0.10), 0 2px 4px rgba(0,0,0,0.05);
+  --shadow-xl: 0 8px 32px rgba(0,0,0,0.12), 0 4px 8px rgba(0,0,0,0.06);
+
+  /* ── Layout ── */
+  --sidebar-width: 240px;
+  --topbar-height: 56px;
+  --content-max: 1200px;
+
+  /* ── Transitions ── */
+  --transition-fast: 120ms ease;
+  --transition-base: 200ms ease;
+  --transition-slow: 300ms ease;
+
+  /* ── Z-index ── */
+  --z-base: 0;
+  --z-panel: 10;
+  --z-nav: 100;
+  --z-modal: 200;
+  --z-toast: 300;
+}
