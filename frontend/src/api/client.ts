@@ -2,7 +2,20 @@
 // API Client — typed fetch functions for all endpoints
 // ============================================================
 
+import type {
+  User, AuthResponse,
+  Project, SiteInfo, LocalProblem, DataSource, Objective,
+  Proposal, Analysis, FormaWorkflowStep, RevitWorkflow,
+  FormaBoardFrame, FinalConcept, PresentationSlide, Walkthrough,
+  TeamMember, ChecklistItem, ReadinessReport
+} from '../types';
+
 const BASE = '/api';
+
+function getAuthHeader(): Record<string, string> {
+  const token = localStorage.getItem('ssp_auth_token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
 
 async function request<T>(
   path: string,
@@ -10,7 +23,11 @@ async function request<T>(
 ): Promise<{ ok: true; data: T } | { ok: false; error: string }> {
   try {
     const res = await fetch(`${BASE}${path}`, {
-      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader(),
+        ...options?.headers,
+      },
       ...options,
     });
 
@@ -41,11 +58,11 @@ async function request<T>(
 function get<T>(path: string) {
   return request<T>(path, { method: 'GET' });
 }
-function post<T>(path: string, body: unknown) {
-  return request<T>(path, { method: 'POST', body: JSON.stringify(body) });
+function post<T>(path: string, body?: unknown) {
+  return request<T>(path, { method: 'POST', body: body !== undefined ? JSON.stringify(body) : undefined });
 }
-function put<T>(path: string, body: unknown) {
-  return request<T>(path, { method: 'PUT', body: JSON.stringify(body) });
+function put<T>(path: string, body?: unknown) {
+  return request<T>(path, { method: 'PUT', body: body !== undefined ? JSON.stringify(body) : undefined });
 }
 function del<T>(path: string) {
   return request<T>(path, { method: 'DELETE' });
@@ -54,15 +71,24 @@ function del<T>(path: string) {
 // ── Health ──
 export const health = () => get<{ status: string }>('/health');
 
-// ── Projects ──
-import type {
-  Project, SiteInfo, LocalProblem, DataSource, Objective,
-  Proposal, Analysis, FormaWorkflowStep, RevitWorkflow,
-  FormaBoardFrame, FinalConcept, PresentationSlide, Walkthrough,
-  TeamMember, ChecklistItem, ReadinessReport
-} from '../types';
-
 export const api = {
+  // Auth
+  auth: {
+    signup: (fullName: string, email: string, password: string, confirmPassword?: string) =>
+      post<AuthResponse>('/auth/signup', {
+        full_name: fullName,
+        email,
+        password,
+        confirm_password: confirmPassword || password,
+      }),
+    login: (email: string, password: string) =>
+      post<AuthResponse>('/auth/login', { email, password }),
+    logout: () => post<{ message: string }>('/auth/logout'),
+    me: () => get<User>('/auth/me'),
+    forgotPassword: (email: string) =>
+      post<{ message: string }>('/auth/forgot-password', { email }),
+  },
+
   // Projects
   projects: {
     list: () => get<Project[]>('/projects'),
@@ -110,11 +136,11 @@ export const api = {
     delete: (pid: string, id: string) => del<{ deleted: string }>(`/projects/${pid}/objectives/${id}`),
   },
 
-  // Proposals
+  // Proposals / Design Options
   proposals: {
     list: (pid: string) => get<Proposal[]>(`/projects/${pid}/proposals`),
     get: (pid: string, propId: string) => get<Proposal>(`/projects/${pid}/proposals/${propId}`),
-    byLabel: (pid: string, label: 'A' | 'B') =>
+    byLabel: (pid: string, label: '1' | '2' | 'A' | 'B') =>
       get<Proposal>(`/projects/${pid}/proposals/by-label/${label}`),
     update: (pid: string, propId: string, data: Partial<Proposal>) =>
       put<Proposal>(`/projects/${pid}/proposals/${propId}`, data),
@@ -194,7 +220,12 @@ export async function uploadFile(file: File): Promise<{ ok: true; url: string } 
   const form = new FormData();
   form.append('file', file);
   try {
-    const res = await fetch('/api/uploads', { method: 'POST', body: form });
+    const token = localStorage.getItem('ssp_auth_token');
+    const res = await fetch('/api/uploads', {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: form,
+    });
     const text = await res.text();
     if (!text || text.trim() === '') {
       return { ok: false, error: `HTTP ${res.status}: Empty server response` };

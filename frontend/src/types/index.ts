@@ -2,8 +2,21 @@
 // Smart City Site Planner — TypeScript Types
 // ============================================================
 
+export interface User {
+  id: string;
+  email: string;
+  full_name: string;
+  created_at?: string;
+}
+
+export interface AuthResponse {
+  user: User;
+  token: string;
+}
+
 export interface Project {
   id: string;
+  user_id?: string;
   name: string;
   city?: string;
   state?: string;
@@ -79,7 +92,7 @@ export interface Objective {
 export interface Proposal {
   id: string;
   project_id: string;
-  label: 'A' | 'B';
+  label: '1' | '2' | 'A' | 'B';
   name?: string;
   concept?: string;
   description?: string;
@@ -109,10 +122,17 @@ export type AnalysisType =
   | 'daylight' | 'wind' | 'microclimate' | 'noise' | 'solar_energy';
 
 export type AnalysisStatus =
-  | 'not_started' | 'evidence_required' | 'uploaded' | 'reviewed';
+  | 'not_started'
+  | 'evidence_required'
+  | 'uploaded'
+  | 'actual_forma_result'
+  | 'user_entered'
+  | 'documented_assumption'
+  | 'reference'
+  | 'source_data';
 
 export type AnalysisProvenance =
-  | 'forma' | 'user' | 'assumption' | 'reference';
+  | 'forma' | 'user' | 'assumption' | 'reference' | 'source_data';
 
 export interface Analysis {
   id: string;
@@ -179,7 +199,7 @@ export interface FormaBoardFrame {
 
 export interface FinalConcept {
   project_id: string;
-  selected_proposal?: 'A' | 'B' | 'hybrid';
+  selected_proposal?: '1' | '2' | 'A' | 'B' | 'hybrid';
   rationale?: string;
   key_evidence?: string;
   tradeoffs?: string;
@@ -262,7 +282,7 @@ export const ANALYSIS_LABELS: Record<AnalysisType, string> = {
   sun_hours: 'Sun Hours',
   daylight: 'Daylight Potential',
   wind: 'Wind Analysis',
-  microclimate: 'Microclimate',
+  microclimate: 'Microclimate Analysis',
   noise: 'Noise Analysis',
   solar_energy: 'Solar Energy',
 };
@@ -271,14 +291,19 @@ export const ANALYSIS_STATUS_LABELS: Record<AnalysisStatus, string> = {
   not_started: 'Not Started',
   evidence_required: 'Evidence Required',
   uploaded: 'Evidence Uploaded',
-  reviewed: 'Reviewed',
+  actual_forma_result: 'Actual Forma Result',
+  user_entered: 'User Entered Result',
+  documented_assumption: 'Documented Assumption',
+  reference: 'Reference',
+  source_data: 'Source Data',
 };
 
 export const PROVENANCE_LABELS: Record<AnalysisProvenance, string> = {
   forma: 'Actual Forma Result',
   user: 'User Entered Result',
   assumption: 'Documented Assumption',
-  reference: 'Reference / Source Data',
+  reference: 'Reference Data',
+  source_data: 'Source Data',
 };
 
 export const PROBLEM_CATEGORY_LABELS: Record<ProblemCategory, string> = {
@@ -292,29 +317,30 @@ export const PROBLEM_CATEGORY_LABELS: Record<ProblemCategory, string> = {
 };
 
 export const SIH_CHECKLIST_LABELS: Record<string, string> = {
-  site_area: 'Site Area ≥ 1 km²',
-  site_limits: 'Site Limits Defined',
-  context: 'Contextual Data Added',
-  landscaping: 'Landscaping Included',
-  buildings: 'Buildings Modeled',
-  transportation: 'Transportation Network',
-  proposal_a: 'Proposal A Created',
-  proposal_b: 'Proposal B Created',
-  analysis_area: 'Area Metrics Analysis',
-  analysis_carbon: 'Embodied Carbon Analysis',
-  analysis_sun: 'Sun Hours Analysis',
-  analysis_daylight: 'Daylight Potential Analysis',
-  analysis_wind: 'Wind Analysis',
-  analysis_microclimate: 'Microclimate Analysis',
-  analysis_noise: 'Noise Analysis',
-  analysis_solar: 'Solar Energy Analysis',
-  forma_board: 'Forma Board Comparison',
-  office_building: 'Office Building Identified',
-  revit_export: 'Revit Export Completed',
-  revit_detailing: 'Revit Detailing Done',
-  revit_sync: 'Revit → Forma Sync-Back',
-  rendered_images: 'Rendered Images',
-  walkthrough_30s: '30-Second Walkthrough Video',
-  presentation_ppt: '5–7 Slide Presentation',
-  final_review: 'Final Review Complete',
+  site_area_1km2: 'Site area ≥ 1.0 km² (1,000,000 m²) verified',
+  site_boundary_polygon: 'Site boundary polygon defined and documented',
+  site_context_analysis: 'Site context analysis completed (1 km radius)',
+  local_problems_documented: 'Minimum 5 local urban problems documented',
+  problem_evidence_sources: 'Evidence sources cited for each problem',
+  objectives_defined: 'Planning objectives defined with measurable targets',
+  design_option_1_concept: 'Design Option 1 concept and massing documented',
+  design_option_2_concept: 'Design Option 2 concept and massing documented',
+  option_1_metrics: 'Option 1 quantitative metrics captured (GFA, density, etc.)',
+  option_2_metrics: 'Option 2 quantitative metrics captured',
+  forma_sun_hours: 'Autodesk Forma sun hours analysis run for both options',
+  forma_daylight: 'Autodesk Forma daylight analysis run for both options',
+  forma_wind: 'Autodesk Forma wind analysis run for both options',
+  forma_microclimate: 'Autodesk Forma microclimate analysis run for both options',
+  forma_embodied_carbon: 'Autodesk Forma embodied carbon analysis run for both options',
+  forma_area_metrics: 'Autodesk Forma area metrics captured for both options',
+  comparison_completed: 'Comparative analysis table completed (Option 1 vs 2)',
+  final_concept_selected: 'Final concept selected with documented rationale',
+  final_concept_evidence: 'Key evidence and tradeoffs documented for final concept',
+  revit_building_exported: 'Focal building exported from Forma to Revit',
+  revit_detailing_done: 'Revit detailing completed for focal building',
+  revit_analysis_rerun: 'Environmental analysis re-run after Revit detailing',
+  presentation_slides_complete: 'Presentation deck (7 slides) completed',
+  walkthrough_recorded: 'Site/design walkthrough video or sequence recorded',
+  team_documented: 'Team members and individual module contributions documented',
 };
+

@@ -1,50 +1,56 @@
 /* ============================================================
    SMART CITY SITE PLANNER — Design Tokens
-   Premium SaaS × Urban Planning Studio × GIS Workspace
+   Professional Digital Urban Planning Studio Workspace
+   Dark Charcoal · Minimal · Architectural
    ============================================================ */
 
 :root {
   /* ── Backgrounds ── */
-  --bg-base: #F7F7F5;
-  --bg-panel: #FFFFFF;
-  --bg-nav: #111111;
-  --bg-nav-hover: #1C1C1C;
-  --bg-nav-active: rgba(37, 99, 235, 0.15);
-  --bg-muted: #F2F2EF;
-  --bg-subtle: #FAFAF8;
-  --bg-overlay: rgba(17, 17, 17, 0.5);
+  --bg-base: #0B0D10;
+  --bg-secondary: #11151A;
+  --bg-surface: #181D23;
+  --bg-surface-elevated: #1F252E;
+  --bg-panel: #181D23;
+  --bg-nav: #0B0D10;
+  --bg-nav-hover: #181D23;
+  --bg-nav-active: rgba(79, 124, 255, 0.12);
+  --bg-muted: #11151A;
+  --bg-subtle: #14191F;
+  --bg-overlay: rgba(11, 13, 16, 0.78);
 
   /* ── Text ── */
-  --text-primary: #111111;
-  --text-secondary: #6B6B6B;
-  --text-tertiary: #9B9B9B;
-  --text-disabled: #C4C4C0;
-  --text-nav: #E5E5E5;
-  --text-nav-muted: #888888;
-  --text-inverse: #FFFFFF;
-  --text-link: #2563EB;
+  --text-primary: #F5F7FA;
+  --text-secondary: #9AA3AE;
+  --text-tertiary: #68717D;
+  --text-muted: #68717D;
+  --text-disabled: #444D56;
+  --text-nav: #F5F7FA;
+  --text-nav-muted: #9AA3AE;
+  --text-inverse: #0B0D10;
+  --text-link: #4F7CFF;
 
   /* ── Borders ── */
-  --border: #E7E7E4;
-  --border-strong: #D0D0CC;
-  --border-focus: #2563EB;
-  --border-nav: rgba(255,255,255,0.08);
+  --border: #292F36;
+  --border-subtle: #1F252E;
+  --border-strong: #3A424D;
+  --border-focus: #4F7CFF;
+  --border-nav: #292F36;
 
-  /* ── Accents ── */
-  --blue: #2563EB;
-  --blue-light: #EFF6FF;
-  --blue-dark: #1D4ED8;
-  --green: #10B981;
-  --green-light: #ECFDF5;
-  --green-dark: #059669;
-  --amber: #F59E0B;
-  --amber-light: #FFFBEB;
-  --red: #EF4444;
-  --red-light: #FEF2F2;
-  --purple: #7C3AED;
-  --purple-light: #F5F3FF;
-  --teal: #0D9488;
-  --teal-light: #F0FDFA;
+  /* ── Accents & Brand ── */
+  --blue: #4F7CFF;
+  --blue-light: rgba(79, 124, 255, 0.12);
+  --blue-dark: #375FD6;
+  --green: #45C58A;
+  --green-light: rgba(69, 197, 138, 0.12);
+  --green-dark: #2EA870;
+  --amber: #E6A23C;
+  --amber-light: rgba(230, 162, 60, 0.12);
+  --red: #E05A5A;
+  --red-light: rgba(224, 90, 90, 0.12);
+  --purple: #8B5CF6;
+  --purple-light: rgba(139, 92, 246, 0.12);
+  --teal: #14B8A6;
+  --teal-light: rgba(20, 184, 166, 0.12);
 
   /* ── Status / Semantic ── */
   --status-complete: var(--green);
@@ -54,10 +60,10 @@
   --status-critical: var(--red);
 
   /* ── Analysis status colors ── */
-  --analysis-not-started: #9B9B9B;
-  --analysis-evidence-required: #F59E0B;
-  --analysis-uploaded: #2563EB;
-  --analysis-reviewed: #10B981;
+  --analysis-not-started: #68717D;
+  --analysis-evidence-required: #E6A23C;
+  --analysis-uploaded: #4F7CFF;
+  --analysis-reviewed: #45C58A;
 
   /* ── Spacing ── */
   --space-1: 4px;
@@ -74,7 +80,7 @@
   --space-20: 80px;
 
   /* ── Typography ── */
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
   --text-xs: 11px;
@@ -104,25 +110,25 @@
   --tracking-wider: 0.08em;
   --tracking-widest: 0.12em;
 
-  /* ── Border radius ── */
+  /* ── Border radius (Restrained, architectural) ── */
   --radius-xs: 2px;
   --radius-sm: 4px;
   --radius-md: 6px;
   --radius-lg: 8px;
-  --radius-xl: 12px;
+  --radius-xl: 10px;
   --radius-full: 9999px;
 
-  /* ── Shadows ── */
-  --shadow-xs: 0 1px 2px rgba(0,0,0,0.05);
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-md: 0 2px 6px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-lg: 0 4px 16px rgba(0,0,0,0.10), 0 2px 4px rgba(0,0,0,0.05);
-  --shadow-xl: 0 8px 32px rgba(0,0,0,0.12), 0 4px 8px rgba(0,0,0,0.06);
+  /* ── Shadows (Subtle, dark ambient) ── */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.6);
+  --shadow-xl: 0 16px 40px rgba(0, 0, 0, 0.7);
 
   /* ── Layout ── */
-  --sidebar-width: 240px;
+  --sidebar-width: 230px;
   --topbar-height: 56px;
-  --content-max: 1200px;
+  --content-max: 1240px;
 
   /* ── Transitions ── */
   --transition-fast: 120ms ease;

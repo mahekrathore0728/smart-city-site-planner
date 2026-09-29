@@ -1,16 +1,17 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Save, Upload, Info, AlertTriangle } from 'lucide-react';
+import { Save, Upload, Layout, CheckCircle2, Image as ImageIcon } from 'lucide-react';
 import { api, uploadFile } from '../../api/client';
 import { useToast } from '../../store/appStore';
 import type { FormaBoardFrame } from '../../types';
 
-const FRAME_DESCRIPTIONS = [
-  'Overview of site location, area, and key local planning challenges.',
-  'Transit-Oriented Compact Development — concept, massing, and key features.',
-  'Green-Blue Resilient Development — concept, network, and key features.',
-  'Side-by-side Forma analysis results for all 8 required analyses.',
-  'Selected final proposal, key evidence, trade-offs, and planning priorities.',
+const BOARD_STORY = [
+  { index: 1, title: '01 Site + Context', desc: 'Site location, 1.0 km² boundary verification, existing roads, terrain contours, and local constraints.' },
+  { index: 2, title: '02 Design Option 1', desc: 'Massing layout, typologies, density profile, and spatial circulation for Option 1.' },
+  { index: 3, title: '03 Design Option 2', desc: 'Alternative massing layout, green-blue network, and circulation strategy for Option 2.' },
+  { index: 4, title: '04 Analysis Comparison', desc: 'Side-by-side Forma environmental analysis comparison across sunlight, wind, and microclimate.' },
+  { index: 5, title: '05 Final Concept', desc: 'Defended synthesis, design decisions, trade-off rationale, and strategic implementation.' },
+  { index: 6, title: '06 Building / Revit Evidence', desc: 'Detailed architectural building modeling, floor plans, and Revit-to-Forma sync evidence.' },
 ];
 
 export default function FormaBoard() {
@@ -18,144 +19,226 @@ export default function FormaBoard() {
   const toast = useToast();
   const [frames, setFrames] = useState<FormaBoardFrame[]>([]);
   const [forms, setForms] = useState<Record<string, Partial<FormaBoardFrame>>>({});
+  const [activeIdx, setActiveIdx] = useState<number>(0);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState<string|null>(null);
-  const [uploading, setUploading] = useState<string|null>(null);
-  const [activeFrame, setActiveFrame] = useState(0);
+  const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (!projectId) return;
-    api.formaBoard.list(projectId).then(res => {
+    api.formaBoard.list(projectId).then((res) => {
       if (res.ok) {
         setFrames(res.data);
         const f: Record<string, Partial<FormaBoardFrame>> = {};
-        res.data.forEach(fr => { f[fr.id] = { ...fr }; });
+        res.data.forEach((fr) => {
+          f[fr.id] = { ...fr };
+        });
         setForms(f);
       }
       setLoading(false);
     });
   }, [projectId]);
 
-  function updateForm(id: string, key: keyof FormaBoardFrame, value: string) {
-    setForms(f => ({ ...f, [id]: { ...f[id], [key]: value } }));
+  const activeStory = BOARD_STORY[activeIdx] || BOARD_STORY[0];
+  const activeFrame = frames[activeIdx];
+  const formData = activeFrame ? (forms[activeFrame.id] || {}) : {};
+  const imagePaths = Array.isArray(formData.image_paths) ? formData.image_paths : [];
+
+  function updateForm(key: keyof FormaBoardFrame, val: string) {
+    if (!activeFrame) return;
+    setForms((f) => ({
+      ...f,
+      [activeFrame.id]: {
+        ...f[activeFrame.id],
+        [key]: val,
+      },
+    }));
   }
 
-  async function handleSave(frame: FormaBoardFrame) {
-    setSaving(frame.id);
-    const res = await api.formaBoard.updateFrame(projectId!, frame.id, forms[frame.id] || {});
-    setSaving(null);
-    if (res.ok) { setFrames(f => f.map(x => x.id === frame.id ? res.data : x)); toast.success('Frame saved'); }
-    else toast.error(res.error);
-  }
-
-  async function handleUpload(frame: FormaBoardFrame, e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]; if (!file) return;
-    setUploading(frame.id);
-    const res = await uploadFile(file);
-    setUploading(null);
+  async function handleSave() {
+    if (!activeFrame || !projectId) return;
+    setSaving(true);
+    const res = await api.formaBoard.updateFrame(projectId, activeFrame.id, {
+      ...forms[activeFrame.id],
+      frame_title: activeStory.title,
+    });
+    setSaving(false);
     if (res.ok) {
-      const current = forms[frame.id] || {};
-      const existingPaths = Array.isArray(current.image_paths) ? current.image_paths : [];
-      const newPaths = [...existingPaths, res.url];
-      setForms(f => ({ ...f, [frame.id]: { ...f[frame.id], image_paths: newPaths } }));
-      const uRes = await api.formaBoard.updateFrame(projectId!, frame.id, { image_paths: newPaths });
-      if (uRes.ok) setFrames(f => f.map(x => x.id === frame.id ? uRes.data : x));
-      toast.success('Image added to frame');
-    } else toast.error(res.error);
+      setFrames((f) => f.map((x) => (x.id === activeFrame.id ? res.data : x)));
+      toast.success('Frame saved');
+    } else {
+      toast.error(res.error || 'Failed to save frame');
+    }
+  }
+
+  async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file || !activeFrame || !projectId) return;
+    setUploading(true);
+    const res = await uploadFile(file);
+    setUploading(false);
+    if (res.ok) {
+      const newPaths = [...imagePaths, res.url];
+      setForms((f) => ({
+        ...f,
+        [activeFrame.id]: { ...f[activeFrame.id], image_paths: newPaths },
+      }));
+      await api.formaBoard.updateFrame(projectId, activeFrame.id, {
+        image_paths: newPaths,
+      });
+      setFrames((f) =>
+        f.map((x) => (x.id === activeFrame.id ? { ...x, image_paths: newPaths } : x))
+      );
+      toast.success('Evidence graphic added to frame');
+    } else {
+      toast.error(res.error || 'Upload failed');
+    }
     e.target.value = '';
   }
 
-  if (loading) return <div className="loading-overlay"><div className="spinner"/></div>;
-
-  const frame = frames[activeFrame];
-  const formData = frame ? (forms[frame.id] || {}) : {};
-  const imagePaths = Array.isArray(formData.image_paths) ? formData.image_paths : [];
+  if (loading) {
+    return (
+      <div className="loading-overlay">
+        <div className="spinner" style={{ width: 28, height: 28 }} />
+      </div>
+    );
+  }
 
   return (
     <div>
       <div className="page-header">
         <div>
-          <h1 className="page-title">Forma Board Story</h1>
-          <p className="page-subtitle">Organize content for your Forma Board presentation</p>
+          <h1 className="page-title">Planning Presentation Board</h1>
+          <p className="page-subtitle">
+            Curate narrative panels and evidence graphics for urban site presentation
+          </p>
         </div>
+
+        <button
+          className="btn btn-primary btn-sm"
+          onClick={handleSave}
+          disabled={saving}
+        >
+          {saving ? 'Saving…' : <><Save size={14} /> Save Active Panel</>}
+        </button>
       </div>
 
-      <div className="info-banner info" style={{ marginBottom:'var(--space-6)' }}>
-        <Info size={15} style={{flexShrink:0}}/> This organizes content for your actual Forma Board in Autodesk Forma. It does not create or publish to Forma Board directly.
-      </div>
+      {/* Frame Strip */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 'var(--space-3)', marginBottom: 'var(--space-6)' }}>
+        {BOARD_STORY.map((story, i) => {
+          const frameItem = frames[i];
+          const hasDesc = Boolean(frameItem?.description || forms[frameItem?.id || '']?.description);
+          const imgCount = frameItem?.image_paths?.length || 0;
+          const isActive = activeIdx === i;
 
-      {/* Frame navigation */}
-      <div style={{ display:'flex', gap:'var(--space-2)', marginBottom:'var(--space-6)', overflowX:'auto', paddingBottom:4 }}>
-        {frames.map((fr, i) => {
-          const hasCont = Boolean(forms[fr.id]?.description || (Array.isArray(forms[fr.id]?.image_paths) && (forms[fr.id].image_paths as string[]).length > 0));
           return (
-            <button key={fr.id} onClick={() => setActiveFrame(i)}
-              style={{ display:'flex', flexDirection:'column', alignItems:'flex-start', padding:'var(--space-3) var(--space-4)', background:'var(--bg-panel)', border:`2px solid ${activeFrame===i ? 'var(--blue)' : 'var(--border)'}`, borderRadius:'var(--radius-lg)', cursor:'pointer', minWidth:140, flexShrink:0 }}>
-              <div style={{ fontSize:'var(--text-xs)', color:'var(--text-tertiary)', textTransform:'uppercase', letterSpacing:'var(--tracking-wider)', marginBottom:4 }}>Frame {i+1}</div>
-              <div style={{ fontWeight:'var(--weight-semibold)', fontSize:'var(--text-sm)', color: activeFrame===i ? 'var(--blue)' : 'var(--text-primary)', lineHeight:1.3 }}>{fr.frame_title}</div>
-              {hasCont && <div style={{ width:6,height:6,borderRadius:'50%',background:'var(--green)',marginTop:6 }}/>}
-            </button>
+            <div
+              key={story.index}
+              className="card"
+              style={{
+                padding: 'var(--space-4)',
+                cursor: 'pointer',
+                borderColor: isActive ? 'var(--blue)' : 'var(--border)',
+                background: isActive ? 'var(--bg-surface-elevated)' : 'var(--bg-surface)',
+                transition: 'all var(--transition-fast)',
+              }}
+              onClick={() => setActiveIdx(i)}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                <span style={{ fontSize: 'var(--text-xs)', fontWeight: 'var(--weight-bold)', color: isActive ? 'var(--blue)' : 'var(--text-secondary)' }}>
+                  Panel {story.index}
+                </span>
+                {hasDesc && <CheckCircle2 size={12} color="var(--green)" />}
+              </div>
+              <div style={{ fontSize: 'var(--text-xs)', fontWeight: 'var(--weight-semibold)', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {story.title}
+              </div>
+              <div style={{ fontSize: '10px', color: 'var(--text-tertiary)', marginTop: 4 }}>
+                {imgCount > 0 ? `${imgCount} visual artifacts` : 'No images yet'}
+              </div>
+            </div>
           );
         })}
       </div>
 
-      {frame && (
-        <div className="card">
-          <div className="card-header">
-            <div>
-              <div style={{ fontSize:'var(--text-xs)', color:'var(--text-tertiary)', textTransform:'uppercase', letterSpacing:'var(--tracking-wider)', marginBottom:4 }}>Frame {activeFrame+1} of {frames.length}</div>
-              <span className="card-title">{frame.frame_title}</span>
-              <p className="card-subtitle">{FRAME_DESCRIPTIONS[activeFrame]}</p>
-            </div>
-            {saving === frame.id && <div className="spinner" style={{width:16,height:16,borderWidth:2}}/>}
+      {/* Active Frame Workspace */}
+      <div className="card">
+        <div className="card-header">
+          <div>
+            <span className="card-title">{activeStory.title}</span>
+            <p className="card-subtitle">{activeStory.desc}</p>
           </div>
-          <div className="card-body" style={{ display:'flex', flexDirection:'column', gap:'var(--space-5)' }}>
-            <div className="form-group">
-              <label className="form-label">Frame Title</label>
-              <input className="input" value={(formData.frame_title as string)||frame.frame_title} onChange={e => updateForm(frame.id,'frame_title',e.target.value)}/>
-            </div>
-            <div className="form-group">
-              <label className="form-label">Description / Summary</label>
-              <textarea className="textarea" rows={4} value={(formData.description as string)||''} onChange={e => updateForm(frame.id,'description',e.target.value)} placeholder={FRAME_DESCRIPTIONS[activeFrame]}/>
-            </div>
+          <span className="badge badge-muted">Panel {activeStory.index} of 6</span>
+        </div>
 
-            {/* Images */}
-            <div className="form-group">
-              <label className="form-label">Frame Images</label>
-              <div style={{ display:'flex', flexWrap:'wrap', gap:'var(--space-3)', marginBottom:'var(--space-3)' }}>
-                {imagePaths.map((src, i) => (
-                  <div key={i} style={{ position:'relative' }}>
-                    <img src={src} alt={`Frame ${activeFrame+1} image ${i+1}`} style={{ width:120,height:80,objectFit:'cover',borderRadius:'var(--radius-md)',border:'1px solid var(--border)' }}/>
-                    <button onClick={() => {
-                      const newPaths = imagePaths.filter((_,j)=>j!==i);
-                      setForms(f=>({...f,[frame.id]:{...f[frame.id],image_paths:newPaths}}));
-                    }} style={{ position:'absolute',top:-6,right:-6,width:18,height:18,borderRadius:'50%',background:'var(--red)',border:'none',cursor:'pointer',color:'#fff',fontSize:11,display:'flex',alignItems:'center',justifyContent:'center' }}>×</button>
+        <div className="card-body" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
+          {/* Narrative description */}
+          <div className="form-group">
+            <label className="form-label">Panel Narrative & Planning Findings</label>
+            <textarea
+              className="textarea"
+              rows={4}
+              value={formData.description || ''}
+              onChange={(e) => updateForm('description', e.target.value)}
+              placeholder={`Document the planning rationale and analytical evidence for ${activeStory.title}…`}
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Decision Notes / Key Takeaways</label>
+            <textarea
+              className="textarea"
+              rows={2}
+              value={formData.decision_notes || ''}
+              onChange={(e) => updateForm('decision_notes', e.target.value)}
+              placeholder="Highlight critical spatial criteria or environmental findings communicated in this frame…"
+            />
+          </div>
+
+          {/* Evidence Graphics */}
+          <div className="form-group">
+            <label className="form-label">Panel Graphics & Verified Artifacts</label>
+            {imagePaths.length > 0 && (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 'var(--space-4)', marginBottom: 'var(--space-4)' }}>
+                {imagePaths.map((p, idx) => (
+                  <div
+                    key={idx}
+                    style={{
+                      borderRadius: 'var(--radius-md)',
+                      overflow: 'hidden',
+                      border: '1px solid var(--border)',
+                      height: 140,
+                      background: '#0B0D10',
+                    }}
+                  >
+                    <img src={p} alt={`Artifact ${idx + 1}`} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                   </div>
                 ))}
-                <label className="upload-area" style={{ width:120,height:80,padding:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',cursor:'pointer' }}>
-                  <input type="file" accept="image/*" style={{display:'none'}} onChange={e=>handleUpload(frame,e)} disabled={uploading===frame.id}/>
-                  {uploading===frame.id ? <div className="spinner" style={{width:16,height:16}}/> : <Upload size={16} color="var(--text-tertiary)"/>}
-                  <span style={{fontSize:'var(--text-xs)',color:'var(--text-tertiary)',marginTop:4}}>Add image</span>
-                </label>
               </div>
-            </div>
+            )}
 
-            <div className="form-group">
-              <label className="form-label">Decision Notes</label>
-              <textarea className="textarea" rows={2} value={(formData.decision_notes as string)||''} onChange={e=>updateForm(frame.id,'decision_notes',e.target.value)} placeholder="Key decisions or conclusions shown in this frame…"/>
-            </div>
+            <label className="upload-area" style={{ display: 'block' }}>
+              <input type="file" accept="image/*" onChange={handleUpload} style={{ display: 'none' }} disabled={uploading} />
+              <Upload size={22} style={{ color: 'var(--blue)', margin: '0 auto var(--space-2)' }} />
+              <div style={{ fontWeight: 'var(--weight-semibold)', color: 'var(--text-primary)', fontSize: 'var(--text-sm)' }}>
+                {uploading ? 'Uploading graphic…' : `Upload Graphic to ${activeStory.title}`}
+              </div>
+              <div className="upload-area-text">Attach high-resolution site plans, Forma diagrams, or Revit axonometrics</div>
+            </label>
           </div>
-          <div className="card-footer" style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-            <div style={{ display:'flex', gap:'var(--space-2)' }}>
-              {activeFrame > 0 && <button className="btn btn-ghost btn-sm" onClick={()=>setActiveFrame(i=>i-1)}>← Previous</button>}
-              {activeFrame < frames.length-1 && <button className="btn btn-ghost btn-sm" onClick={()=>setActiveFrame(i=>i+1)}>Next →</button>}
-            </div>
-            <button className="btn btn-primary" onClick={()=>handleSave(frame)} disabled={saving===frame.id}>
-              <Save size={14}/> Save Frame
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={handleSave}
+              disabled={saving}
+            >
+              {saving ? 'Saving…' : <><Save size={14} /> Save Panel Changes</>}
             </button>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }

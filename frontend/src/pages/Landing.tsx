@@ -1,107 +1,333 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, BarChart2, FileText, ArrowRight, ExternalLink } from 'lucide-react';
+import {
+  ArrowRight, MapPin, Play,
+  LayoutGrid, BarChart2, GitCompare, Lightbulb,
+  CheckCircle2, Leaf, Users, Cpu, Map,
+  Layers, Maximize2, Compass, Box
+} from 'lucide-react';
+import { useAuthStore } from '../store/authStore';
 import './Landing.css';
 
 export default function Landing() {
   const navigate = useNavigate();
+  const { user } = useAuthStore();
+  const [activeHeroView, setActiveHeroView] = useState<'site' | 'context' | 'analysis' | 'options'>('site');
+
+  function handleStartPlanning() {
+    navigate(user ? '/projects' : '/signup');
+  }
+
+  function scrollTo(id: string) {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+  }
+
   return (
-    <div className="landing">
-      <header className="landing-nav">
-        <div className="landing-nav-brand">
-          <div className="landing-nav-logo">
-            <MapPin size={14} strokeWidth={2.5} />
+    <div className="lp-root">
+
+      {/* ── NAVBAR ── */}
+      <header className="lp-nav">
+        <div className="lp-nav-inner">
+          <div className="lp-nav-brand" onClick={() => navigate('/')}>
+            <div className="lp-nav-logo">
+              <Map size={16} strokeWidth={2.5} />
+            </div>
+            <span className="lp-nav-name">
+              Smart City <span className="lp-nav-name-sub">Site Planner</span>
+            </span>
           </div>
-          <span>Smart City Site Planner</span>
-        </div>
-        <div className="landing-nav-actions">
-          <span className="badge badge-blue">SIH 26114</span>
-          <button className="btn btn-secondary btn-sm" onClick={() => navigate('/projects')}>View Projects</button>
-          <button className="btn btn-primary btn-sm" onClick={() => navigate('/projects/new')}>Start Project</button>
+
+          <nav className="lp-nav-links">
+            <button className="lp-nav-link" onClick={() => scrollTo('process')}>Projects</button>
+            <button className="lp-nav-link" onClick={() => scrollTo('process')}>Workflows</button>
+            <button className="lp-nav-link" onClick={() => scrollTo('platform')}>Resources</button>
+            <button className="lp-nav-link" onClick={() => scrollTo('cta')}>About</button>
+          </nav>
+
+          <button className="lp-nav-cta" onClick={handleStartPlanning}>
+            Open Planner <ArrowRight size={14} />
+          </button>
         </div>
       </header>
 
-      <main className="landing-hero">
-        {/* SVG urban planning map background */}
-        <svg className="landing-map-bg" viewBox="0 0 600 500" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          {/* Roads grid */}
-          <line x1="0" y1="120" x2="600" y2="120" stroke="#111" strokeWidth="8" opacity="0.4"/>
-          <line x1="0" y1="260" x2="600" y2="260" stroke="#111" strokeWidth="8" opacity="0.4"/>
-          <line x1="0" y1="400" x2="600" y2="400" stroke="#111" strokeWidth="8" opacity="0.4"/>
-          <line x1="120" y1="0" x2="120" y2="500" stroke="#111" strokeWidth="8" opacity="0.4"/>
-          <line x1="280" y1="0" x2="280" y2="500" stroke="#111" strokeWidth="8" opacity="0.4"/>
-          <line x1="440" y1="0" x2="440" y2="500" stroke="#111" strokeWidth="8" opacity="0.4"/>
-          {/* City blocks */}
-          <rect x="130" y="130" width="140" height="120" fill="#111" opacity="0.05"/>
-          <rect x="290" y="130" width="140" height="120" fill="#111" opacity="0.05"/>
-          <rect x="130" y="270" width="140" height="120" fill="#111" opacity="0.05"/>
-          <rect x="290" y="270" width="140" height="120" fill="#111" opacity="0.05"/>
-          <rect x="0" y="130" width="110" height="120" fill="#111" opacity="0.05"/>
-          <rect x="450" y="130" width="150" height="120" fill="#111" opacity="0.05"/>
-          <rect x="0" y="270" width="110" height="120" fill="#111" opacity="0.05"/>
-          {/* Buildings */}
-          {[140,160,180,200,220,240,300,320,340,360,380,400].map((x, i) => (
-            <rect key={i} x={x} y={140 + (i % 3) * 20} width="14" height={20 + (i % 4) * 8} fill="#111" opacity="0.15"/>
-          ))}
-          {/* Green spaces */}
-          <rect x="130" y="130" width="40" height="40" fill="#10B981" opacity="0.3" rx="2"/>
-          <rect x="380" y="280" width="50" height="50" fill="#10B981" opacity="0.3" rx="2"/>
-          <rect x="0" y="0" width="110" height="110" fill="#10B981" opacity="0.15" rx="2"/>
-          {/* Site boundary */}
-          <rect x="80" y="80" width="440" height="340" fill="none" stroke="#2563EB" strokeWidth="3" strokeDasharray="10 6" opacity="0.6" rx="4"/>
-          {/* Site label */}
-          <text x="90" y="75" fontSize="11" fill="#2563EB" fontWeight="600" opacity="0.7">SITE BOUNDARY · 2.5 km²</text>
-          {/* Transit line */}
-          <line x1="0" y1="260" x2="600" y2="260" stroke="#7C3AED" strokeWidth="4" opacity="0.5"/>
-          <circle cx="120" cy="260" r="8" fill="#7C3AED" opacity="0.6"/>
-          <circle cx="280" cy="260" r="8" fill="#7C3AED" opacity="0.6"/>
-          <circle cx="440" cy="260" r="8" fill="#7C3AED" opacity="0.6"/>
-        </svg>
+      {/* ── HERO ── */}
+      <section className="lp-hero">
+        <div className="lp-hero-bg" />
 
-        <div className="landing-content">
-          <div className="landing-sih-badge">
-            <span className="badge badge-blue">SIH 26114 · Problem Statement</span>
-          </div>
-          <h1 className="landing-headline">
-            SMART CITY<br />SITE PLANNER
+        {/* Location pill */}
+        <div className="lp-hero-location">
+          <MapPin size={13} />
+          Mahalunge, Pune · 1.20 km²
+        </div>
+
+        {/* Left content */}
+        <div className="lp-hero-content">
+          <p className="lp-hero-eyebrow">URBAN PLANNING PLATFORM</p>
+          <h1 className="lp-hero-title">
+            Shape the city<br />
+            <span className="lp-hero-title-blue">before you build it.</span>
           </h1>
-          <p className="landing-sub">
-            Design better places with data-driven site planning.<br/>
-            A professional command center for Autodesk Forma workflows.
+          <p className="lp-hero-sub">
+            Analyze. Design. Create sustainable and resilient urban spaces<br />
+            with data-driven insights and performance-backed site proposals.
           </p>
-          <div className="landing-ctas">
-            <button className="btn btn-primary btn-xl" onClick={() => navigate('/projects/new')}>
-              Start Project <ArrowRight size={16} />
+          <div className="lp-hero-ctas">
+            <button className="lp-btn-primary" onClick={handleStartPlanning}>
+              Start Planning <ArrowRight size={15} />
             </button>
-            <button className="btn btn-secondary btn-xl" onClick={() => navigate('/projects')}>
-              View Projects
+            <button className="lp-btn-ghost" onClick={() => scrollTo('process')}>
+              <span className="lp-play-icon"><Play size={12} fill="currentColor" /></span>
+              Explore How It Works
+            </button>
+          </div>
+        </div>
+
+        {/* Scroll indicator */}
+        <div className="lp-hero-scroll">
+          <div className="lp-scroll-mouse">
+            <div className="lp-scroll-dot" />
+          </div>
+          <span>Scroll</span>
+        </div>
+
+        {/* Bottom-right view mode bar */}
+        <div className="lp-hero-viewbar">
+          <button
+            className={`lp-viewbar-btn ${activeHeroView === 'site' ? 'active' : ''}`}
+            onClick={() => setActiveHeroView('site')}
+          >
+            <LayoutGrid size={14} /> Site
+          </button>
+          <button
+            className={`lp-viewbar-btn ${activeHeroView === 'context' ? 'active' : ''}`}
+            onClick={() => setActiveHeroView('context')}
+          >
+            <MapPin size={14} /> Context
+          </button>
+          <button
+            className={`lp-viewbar-btn ${activeHeroView === 'analysis' ? 'active' : ''}`}
+            onClick={() => setActiveHeroView('analysis')}
+          >
+            <BarChart2 size={14} /> Analysis
+          </button>
+          <button
+            className={`lp-viewbar-btn ${activeHeroView === 'options' ? 'active' : ''}`}
+            onClick={() => setActiveHeroView('options')}
+          >
+            <GitCompare size={14} /> Options
+          </button>
+        </div>
+      </section>
+
+      {/* ── PROCESS SECTION ── */}
+      <section className="lp-process" id="process">
+        <div className="lp-process-inner">
+          {/* Left */}
+          <div className="lp-process-left">
+            <p className="lp-section-eyebrow">THE PROCESS</p>
+            <h2 className="lp-process-title">From Site to Strategy</h2>
+            <p className="lp-process-desc">
+              A simple, connected workflow to turn your ideas into real, data-backed urban solutions.
+            </p>
+          </div>
+
+          {/* Right: 4 steps */}
+          <div className="lp-steps">
+            {[
+              { n: '01', icon: <MapPin size={20} />, title: 'Site Context', desc: 'Understand your site, terrain, and contextual surroundings.' },
+              { n: '02', icon: <LayoutGrid size={20} />, title: 'Design Options', desc: 'Explore multiple planning alternatives and massing schemes.' },
+              { n: '03', icon: <BarChart2 size={20} />, title: 'Environmental Analysis', desc: 'Evaluate climate, noise, wind, daylight, and carbon potential.' },
+              { n: '04', icon: <Leaf size={20} />, title: 'Final Concept', desc: 'Compare, refine and choose the optimal site proposal.' },
+            ].map((step, i) => (
+              <div key={step.n} className="lp-step-wrap">
+                <div className="lp-step">
+                  <div className="lp-step-icon">{step.icon}</div>
+                  <p className="lp-step-num">{step.n}</p>
+                  <h3 className="lp-step-title">{step.title}</h3>
+                  <p className="lp-step-desc">{step.desc}</p>
+                </div>
+                {i < 3 && <div className="lp-step-arrow"><ArrowRight size={16} /></div>}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── PLATFORM SECTION ── */}
+      <section className="lp-platform" id="platform">
+        <div className="lp-platform-inner">
+          {/* Left: mock workspace */}
+          <div className="lp-workspace-frame">
+            <div className="lp-workspace-topbar">
+              <div className="lp-ws-logo">
+                <Map size={13} strokeWidth={2.5} />
+                <span>Smart City Site Planner</span>
+              </div>
+              <div className="lp-ws-topbar-icons">
+                <div className="lp-ws-dot" />
+                <div className="lp-ws-dot" />
+              </div>
+            </div>
+            <div className="lp-workspace-body">
+              {/* Sidebar */}
+              <div className="lp-ws-sidebar">
+                {['Home', 'Site Design', 'Analysis', 'Design Options', 'Board', 'Settings'].map((item, i) => (
+                  <div key={item} className={`lp-ws-nav-item ${i === 1 ? 'active' : ''}`}>
+                    <div className="lp-ws-nav-dot" />
+                    {item}
+                  </div>
+                ))}
+              </div>
+
+              {/* Main content */}
+              <div className="lp-ws-main">
+                {/* Map area */}
+                <div className="lp-ws-map">
+                  <img src="/hero-city.jpg" alt="Site plan aerial" />
+                  <div className="lp-ws-map-overlay" />
+                  <div className="lp-ws-map-toolbar">
+                    <div className="lp-ws-tb-btn"><Layers size={11} /></div>
+                    <div className="lp-ws-tb-btn"><Box size={11} /></div>
+                    <div className="lp-ws-tb-btn"><Compass size={11} /></div>
+                    <div className="lp-ws-tb-btn"><Maximize2 size={11} /></div>
+                  </div>
+                </div>
+
+                {/* Right panel */}
+                <div className="lp-ws-panel">
+                  <div className="lp-ws-panel-header">Analysis Results</div>
+                  <div className="lp-ws-analysis-list">
+                    {[
+                      { label: 'Sun Hours', color: '#4ade80' },
+                      { label: 'Daylight Potential', color: '#facc15' },
+                      { label: 'Wind Analysis', color: '#4ade80' },
+                      { label: 'Noise', color: '#4ade80' },
+                      { label: 'Solar Energy', color: '#60a5fa' },
+                    ].map(a => (
+                      <div key={a.label} className="lp-ws-analysis-row">
+                        <span>{a.label}</span>
+                        <div className="lp-ws-analysis-dot" style={{ backgroundColor: a.color, color: a.color }} />
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="lp-ws-panel-header" style={{ marginTop: 14 }}>Area Metrics</div>
+                  <div className="lp-ws-metrics">
+                    <div className="lp-ws-bar-chart">
+                      {[40, 65, 30, 85, 50, 75].map((h, i) => (
+                        <div key={i} className="lp-ws-bar" style={{ height: `${h}%` }} />
+                      ))}
+                    </div>
+                    <div className="lp-ws-donut">
+                      <svg viewBox="0 0 60 60" width="60" height="60">
+                        <circle cx="30" cy="30" r="22" fill="none" stroke="#1e293b" strokeWidth="6" />
+                        <circle cx="30" cy="30" r="22" fill="none" stroke="#3B82F6" strokeWidth="6"
+                          strokeDasharray="100 38" strokeDashoffset="25" strokeLinecap="round" />
+                      </svg>
+                      <div className="lp-ws-donut-label">
+                        <div style={{ fontSize: 9, fontWeight: 700, color: '#fff' }}>Total Area</div>
+                        <div style={{ fontSize: 8, color: '#94a3b8' }}>1.00 km²</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right: copy */}
+          <div className="lp-platform-copy">
+            <p className="lp-section-eyebrow">ONE PLATFORM. ENDLESS POSSIBILITIES.</p>
+            <h2 className="lp-platform-title">
+              One workspace for the<br />complete planning process.
+            </h2>
+            <p className="lp-platform-desc">
+              Visualize your site, run analysis, compare options and bring your vision to life — all in one place.
+            </p>
+            <ul className="lp-checklist">
+              {[
+                'Interactive maps & 3D view',
+                'Built-in environmental analysis tools',
+                'Easy comparison of design options',
+                'Seamless Revit / BIM workflow integration',
+              ].map(item => (
+                <li key={item} className="lp-checklist-item">
+                  <CheckCircle2 size={16} className="lp-check-icon" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+            <button className="lp-btn-primary" onClick={handleStartPlanning} style={{ marginTop: 32 }}>
+              Start Planning <ArrowRight size={15} />
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* ── FINAL CTA SECTION ── */}
+      <section className="lp-cta" id="cta">
+        <div className="lp-cta-bg" />
+        <div className="lp-cta-inner">
+          {/* Left */}
+          <div className="lp-cta-left">
+            <p className="lp-section-eyebrow" style={{ color: '#64748b' }}>READY TO BUILD A SMARTER TOMORROW?</p>
+            <h2 className="lp-cta-title">Start shaping your next site.</h2>
+            <p className="lp-cta-desc">
+              Create, analyze and compare your smart-city site proposals with performance-driven insights.
+            </p>
+            <button className="lp-btn-primary" onClick={handleStartPlanning} style={{ marginTop: 32 }}>
+              Create Project <ArrowRight size={15} />
             </button>
           </div>
 
-          <div className="landing-features">
-            <div className="landing-feature">
-              <div className="landing-feature-icon"><MapPin size={18} /></div>
-              <div className="landing-feature-title">Forma Workflow Documentation</div>
-              <div className="landing-feature-desc">Track your Autodesk Forma site design progress step by step</div>
+          {/* Right: benefits */}
+          <div className="lp-benefits">
+            <div className="lp-benefit">
+              <div className="lp-benefit-icon" style={{ color: '#4ade80' }}>
+                <Leaf size={22} />
+              </div>
+              <h3 className="lp-benefit-title">Sustainable</h3>
+              <p className="lp-benefit-desc">Greener cities. Healthier lives.</p>
             </div>
-            <div className="landing-feature">
-              <div className="landing-feature-icon"><BarChart2 size={18} /></div>
-              <div className="landing-feature-title">Analysis-Driven Decisions</div>
-              <div className="landing-feature-desc">Document all 8 Forma analyses with findings and design responses</div>
+            <div className="lp-benefit">
+              <div className="lp-benefit-icon" style={{ color: '#60a5fa' }}>
+                <Users size={22} />
+              </div>
+              <h3 className="lp-benefit-title">People-Centric</h3>
+              <p className="lp-benefit-desc">Better spaces. Stronger communities.</p>
             </div>
-            <div className="landing-feature">
-              <div className="landing-feature-icon"><FileText size={18} /></div>
-              <div className="landing-feature-title">Presentation Builder</div>
-              <div className="landing-feature-desc">Organize your 5–7 slide SIH presentation and Forma Board story</div>
+            <div className="lp-benefit">
+              <div className="lp-benefit-icon" style={{ color: '#a78bfa' }}>
+                <Cpu size={22} />
+              </div>
+              <h3 className="lp-benefit-title">Future-Ready</h3>
+              <p className="lp-benefit-desc">Built for what's next.</p>
             </div>
           </div>
         </div>
-      </main>
+      </section>
 
-      <footer className="landing-footer-note">
-        <ExternalLink size={12} style={{ display:'inline', verticalAlign:'middle', marginRight:4 }} />
-        A companion platform for the Autodesk Forma Site Design workflow · Not affiliated with Autodesk Inc.
-        &nbsp;·&nbsp; SIH Problem Statement 26114
+      {/* ── FOOTER ── */}
+      <footer className="lp-footer">
+        <div className="lp-footer-inner">
+          <div className="lp-footer-brand">
+            <div className="lp-nav-logo" style={{ width: 26, height: 26, borderRadius: 6 }}>
+              <Map size={13} strokeWidth={2.5} />
+            </div>
+            <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>
+              Smart City Site Planner
+            </span>
+          </div>
+          <p className="lp-footer-copy">
+            © {new Date().getFullYear()} Smart City Site Planner · SIH 2026 Problem Statement 26114
+          </p>
+          <div className="lp-footer-links">
+            <button className="lp-nav-link" onClick={() => navigate('/login')}>Login</button>
+            <button className="lp-nav-link" onClick={() => navigate('/signup')}>Sign Up</button>
+          </div>
+        </div>
       </footer>
+
     </div>
   );
 }

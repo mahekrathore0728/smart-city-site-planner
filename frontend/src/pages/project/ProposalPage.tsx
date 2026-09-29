@@ -1,195 +1,351 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { Save, Plus, Trash2, Info } from 'lucide-react';
-import { api } from '../../api/client';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Save, Layers, Upload, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { api, uploadFile } from '../../api/client';
 import { useToast } from '../../store/appStore';
 import type { Proposal, ProposalMetric } from '../../types';
 
-interface Props { label: 'A' | 'B' }
+interface Props {
+  label: '1' | '2' | 'A' | 'B';
+}
 
-const TEMPLATES = {
-  A: { name:'Proposal A', concept:'Transit-Oriented Compact Development', description:'Higher density mixed-use development concentrated around transit nodes, with walkable streets and compact urban form.', planning_strategy:'Compact, high-density development gradient from transit core to periphery. Mixed-use zones with retail, office, and residential.', transportation:'Metro feeder buses, shared mobility hubs at transit nodes, elevated pedestrian walkways, cycle tracks.', buildings:'Mixed-use towers (G+15 to G+25) at transit nodes, mid-rise residential (G+6 to G+10) at periphery.', landscaping:'Linear green corridors along streets, rooftop gardens, pocket parks, tree-lined boulevards.', density:'High density at core (FSI 3.5–4.0), medium at periphery (FSI 1.5–2.0)', advantages:'High transit ridership potential, reduced car dependency, efficient land use, economic vitality.', tradeoffs:'Higher embodied carbon from dense construction, less ground-level green space, potential overshadowing.' },
-  B: { name:'Proposal B', concept:'Green-Blue Resilient Development', description:'Moderate density with emphasis on blue-green infrastructure, flood resilience, and urban cooling throughout the site.', planning_strategy:'Distributed moderate density with extensive green-blue network. Environmental resilience as primary organizing principle.', transportation:'Green mobility corridors, cycling infrastructure, pedestrian priority streets, low-speed zones.', buildings:'Low-to-mid-rise buildings (G+4 to G+10) distributed across site with generous green buffers between blocks.', landscaping:'Extensive green network: wetlands, rain gardens, linear parks, tree canopy, blue corridors.', density:'Moderate density throughout (FSI 1.5–2.5), more even distribution across site.', advantages:'Lower heat stress, flood resilience, better daylight access, biodiversity, community amenity.', tradeoffs:'Lower FAR means less housing/commercial capacity per unit area, may require larger site.' },
-};
-
-export default function ProposalPage({ label }: Props) {
+export default function ProposalPage({ label: defaultLabel }: Props) {
   const { projectId } = useParams<{ projectId: string }>();
+  const navigate = useNavigate();
   const toast = useToast();
+
+  const [activeOpt, setActiveOpt] = useState<'1' | '2'>(
+    defaultLabel === '2' || defaultLabel === 'B' ? '2' : '1'
+  );
   const [proposal, setProposal] = useState<Proposal | null>(null);
   const [form, setForm] = useState<Partial<Proposal>>({});
-  const [metrics, setMetrics] = useState<ProposalMetric[]>([]);
+  const [images, setImages] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const other = label === 'A' ? 'B' : 'A';
-  const accent = label === 'A' ? 'var(--blue)' : 'var(--green)';
-  const tmpl = TEMPLATES[label];
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (!projectId) return;
-    api.proposals.byLabel(projectId, label).then(res => {
+    setLoading(true);
+    api.proposals.byLabel(projectId, activeOpt).then((res) => {
       if (res.ok) {
         setProposal(res.data);
         setForm(res.data);
-        setMetrics(Array.isArray(res.data.metrics) ? res.data.metrics : []);
+        setImages(Array.isArray(res.data.images) ? res.data.images : []);
       }
       setLoading(false);
     });
-  }, [projectId, label]);
+  }, [projectId, activeOpt]);
 
   function field(key: keyof Proposal, value: string) {
-    setForm(f => ({ ...f, [key]: value }));
+    setForm((f) => ({ ...f, [key]: value }));
   }
-
-  function addMetric() { setMetrics(m => [...m, { label:'', value:'', unit:'' }]); }
-  function updateMetric(idx: number, key: keyof ProposalMetric, val: string) {
-    setMetrics(m => m.map((x, i) => i === idx ? { ...x, [key]: val } : x));
-  }
-  function removeMetric(idx: number) { setMetrics(m => m.filter((_, i) => i !== idx)); }
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
-    if (!proposal) return;
+    if (!proposal || !projectId) return;
     setSaving(true);
-    const res = await api.proposals.update(projectId!, proposal.id, { ...form, metrics });
+
+    const res = await api.proposals.update(projectId, proposal.id, {
+      ...form,
+      images,
+    });
     setSaving(false);
-    if (res.ok) { setProposal(res.data); toast.success(`Proposal ${label} saved`); }
-    else toast.error(res.error);
+    if (res.ok) {
+      setProposal(res.data);
+      toast.success(`Design Option ${activeOpt} saved`);
+    } else {
+      toast.error(res.error || 'Failed to save option');
+    }
   }
 
-  function applyTemplate() {
-    setForm(f => ({ ...f, ...tmpl }));
-    toast.info('Template applied — edit to match your actual proposal');
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file || !proposal || !projectId) return;
+    setUploading(true);
+    const res = await uploadFile(file);
+    setUploading(false);
+    if (res.ok) {
+      const newImages = [...images, res.url];
+      setImages(newImages);
+      await api.proposals.update(projectId, proposal.id, { images: newImages });
+      toast.success('Visual artifact uploaded');
+    } else {
+      toast.error(res.error || 'Upload failed');
+    }
+    e.target.value = '';
   }
 
-  if (loading) return <div className="loading-overlay"><div className="spinner"/></div>;
-  if (!proposal) return <div className="info-banner error">Proposal not found</div>;
+  const optionColor = activeOpt === '1' ? 'var(--blue)' : 'var(--green)';
 
   return (
     <div>
+      {/* ── Top Header with Option Switcher ── */}
       <div className="page-header">
-        <div style={{ display:'flex', alignItems:'center', gap:'var(--space-3)' }}>
-          <div style={{ width:36, height:36, borderRadius:'var(--radius-md)', background:accent, display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', fontWeight:800, fontSize:'var(--text-xl)', flexShrink:0 }}>{label}</div>
-          <div>
-            <h1 className="page-title">Proposal {label}</h1>
-            <p className="page-subtitle">{form.concept || tmpl.concept}</p>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginBottom: 'var(--space-2)' }}>
+            <span className="badge badge-muted">Site Planning Typology</span>
+            <span
+              className="badge"
+              style={{
+                background: form.status === 'complete' ? 'rgba(69, 197, 138, 0.15)' : 'rgba(79, 124, 255, 0.15)',
+                color: form.status === 'complete' ? '#6EE7B7' : '#93C5FD',
+              }}
+            >
+              {form.status === 'complete' ? 'Completed' : 'Draft Option'}
+            </span>
           </div>
-        </div>
-        <div style={{ display:'flex', gap:'var(--space-2)', alignItems:'center' }}>
-          {!form.concept && <button className="btn btn-ghost btn-sm" onClick={applyTemplate}>Use Template</button>}
-          <span className={`badge ${proposal.status==='complete'?'badge-green':'badge-muted'}`}>{proposal.status}</span>
-        </div>
-      </div>
-
-      <div className="info-banner info" style={{ marginBottom:'var(--space-6)' }}>
-        <Info size={14} style={{flexShrink:0}}/> This proposal is completely independent from Proposal {other}. Data entered here does not affect the other proposal.
-      </div>
-
-      <form onSubmit={handleSave} style={{ display:'flex', flexDirection:'column', gap:'var(--space-6)' }}>
-        {/* Concept */}
-        <div className="card">
-          <div className="card-header" style={{ borderTop:`3px solid ${accent}` }}>
-            <span className="card-title">Concept</span>
-          </div>
-          <div className="card-body" style={{ display:'flex', flexDirection:'column', gap:'var(--space-4)' }}>
-            <div className="form-group">
-              <label className="form-label">Proposal Name</label>
-              <input className="input" value={form.name||''} onChange={e=>field('name',e.target.value)} placeholder={tmpl.name}/>
-            </div>
-            <div className="form-group">
-              <label className="form-label">Concept</label>
-              <input className="input" value={form.concept||''} onChange={e=>field('concept',e.target.value)} placeholder={tmpl.concept}/>
-            </div>
-            <div className="form-group">
-              <label className="form-label">Description</label>
-              <textarea className="textarea" rows={4} value={form.description||''} onChange={e=>field('description',e.target.value)} placeholder={tmpl.description}/>
-            </div>
-          </div>
+          <h1 className="page-title">Design Option {activeOpt}</h1>
+          <p className="page-subtitle">
+            {form.name || `Design Option ${activeOpt}`} — Formulate massing, spatial layout, and circulation strategy
+          </p>
         </div>
 
-        {/* Planning details */}
-        <div className="card">
-          <div className="card-header"><span className="card-title">Planning Details</span></div>
-          <div className="card-body" style={{ display:'flex', flexDirection:'column', gap:'var(--space-4)' }}>
-            {[
-              { key:'planning_strategy' as const, label:'Planning Strategy', ph: tmpl.planning_strategy },
-              { key:'transportation' as const, label:'Transportation Approach', ph: tmpl.transportation },
-              { key:'buildings' as const, label:'Building Typology', ph: tmpl.buildings },
-              { key:'landscaping' as const, label:'Landscaping Strategy', ph: tmpl.landscaping },
-            ].map(f => (
-              <div key={f.key} className="form-group">
-                <label className="form-label">{f.label}</label>
-                <textarea className="textarea" rows={2} value={form[f.key]||''} onChange={e=>field(f.key,e.target.value)} placeholder={f.ph}/>
-              </div>
-            ))}
+        <div style={{ display: 'flex', gap: 'var(--space-3)', alignItems: 'center' }}>
+          {/* Switcher Pills */}
+          <div style={{ display: 'flex', background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', padding: 3 }}>
+            <button
+              type="button"
+              className={`btn btn-sm ${activeOpt === '1' ? 'btn-primary' : 'btn-ghost'}`}
+              onClick={() => setActiveOpt('1')}
+            >
+              Option 1
+            </button>
+            <button
+              type="button"
+              className={`btn btn-sm ${activeOpt === '2' ? 'btn-primary' : 'btn-ghost'}`}
+              onClick={() => setActiveOpt('2')}
+            >
+              Option 2
+            </button>
           </div>
-        </div>
 
-        {/* Density and trade-offs */}
-        <div className="card">
-          <div className="card-header"><span className="card-title">Density & Trade-offs</span></div>
-          <div className="card-body" style={{ display:'flex', flexDirection:'column', gap:'var(--space-4)' }}>
-            <div className="form-group">
-              <label className="form-label">Density</label>
-              <input className="input" value={form.density||''} onChange={e=>field('density',e.target.value)} placeholder={tmpl.density}/>
-            </div>
-            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'var(--space-4)' }}>
-              <div className="form-group">
-                <label className="form-label">Advantages</label>
-                <textarea className="textarea" rows={3} value={form.advantages||''} onChange={e=>field('advantages',e.target.value)} placeholder={tmpl.advantages}/>
-              </div>
-              <div className="form-group">
-                <label className="form-label">Trade-offs</label>
-                <textarea className="textarea" rows={3} value={form.tradeoffs||''} onChange={e=>field('tradeoffs',e.target.value)} placeholder={tmpl.tradeoffs}/>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Key metrics */}
-        <div className="card">
-          <div className="card-header">
-            <span className="card-title">Key Metrics</span>
-            <button type="button" className="btn btn-ghost btn-sm" onClick={addMetric}><Plus size={13}/> Add Metric</button>
-          </div>
-          <div className="card-body">
-            {metrics.length === 0 && (
-              <div style={{ color:'var(--text-tertiary)', fontSize:'var(--text-base)', textAlign:'center', padding:'var(--space-6) 0' }}>No metrics yet — add quantifiable planning targets</div>
-            )}
-            {metrics.map((m, i) => (
-              <div key={i} style={{ display:'grid', gridTemplateColumns:'2fr 1fr 1fr auto', gap:'var(--space-3)', marginBottom:'var(--space-3)', alignItems:'center' }}>
-                <input className="input" placeholder="Metric label" value={m.label} onChange={e=>updateMetric(i,'label',e.target.value)}/>
-                <input className="input" placeholder="Value" value={m.value} onChange={e=>updateMetric(i,'value',e.target.value)}/>
-                <input className="input" placeholder="Unit (km², %…)" value={m.unit||''} onChange={e=>updateMetric(i,'unit',e.target.value)}/>
-                <button type="button" className="btn btn-ghost btn-icon" onClick={()=>removeMetric(i)}><Trash2 size={13} color="var(--red)"/></button>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Notes + Status */}
-        <div className="card">
-          <div className="card-header"><span className="card-title">Notes & Status</span></div>
-          <div className="card-body" style={{ display:'flex', flexDirection:'column', gap:'var(--space-4)' }}>
-            <div className="form-group">
-              <label className="form-label">Notes</label>
-              <textarea className="textarea" rows={3} value={form.notes||''} onChange={e=>field('notes',e.target.value)} placeholder="Any additional planning notes, decisions, or context…"/>
-            </div>
-            <div className="form-group">
-              <label className="form-label">Status</label>
-              <select className="select" style={{ maxWidth:200 }} value={form.status||'draft'} onChange={e=>field('status',e.target.value)}>
-                <option value="draft">Draft</option>
-                <option value="complete">Complete</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <div style={{ display:'flex', justifyContent:'flex-end' }}>
-          <button type="submit" className="btn btn-primary" disabled={saving}>
-            {saving ? <><div className="spinner" style={{width:14,height:14,borderWidth:2}}/> Saving…</> : <><Save size={15}/> Save Proposal {label}</>}
+          <button
+            className="btn btn-secondary btn-sm"
+            onClick={() => navigate(`/projects/${projectId}/comparison`)}
+          >
+            Compare Options <ArrowRight size={13} />
           </button>
         </div>
-      </form>
+      </div>
+
+      {loading ? (
+        <div className="loading-overlay">
+          <div className="spinner" style={{ width: 28, height: 28 }} />
+        </div>
+      ) : (
+        <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
+          {/* ── 1. Option Identity & Concept ── */}
+          <div className="card">
+            <div className="card-header" style={{ borderLeft: `4px solid ${optionColor}` }}>
+              <div>
+                <span className="card-title">Concept & Strategy</span>
+                <p className="card-subtitle">Strategic planning intent and core urban proposition</p>
+              </div>
+
+              <select
+                className="select"
+                style={{ width: 'auto', padding: '4px 10px', fontSize: 'var(--text-xs)' }}
+                value={form.status || 'draft'}
+                onChange={(e) => field('status', e.target.value)}
+              >
+                <option value="draft">Status: Draft</option>
+                <option value="complete">Status: Completed</option>
+              </select>
+            </div>
+
+            <div className="card-body" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
+                <div className="form-group">
+                  <label className="form-label">Option Name</label>
+                  <input
+                    className="input"
+                    value={form.name || ''}
+                    onChange={(e) => field('name', e.target.value)}
+                    placeholder={activeOpt === '1' ? 'e.g. Transit-Oriented Compact District' : 'e.g. Green-Blue Resilient Urban Grid'}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Concept Statement</label>
+                  <input
+                    className="input"
+                    value={form.concept || ''}
+                    onChange={(e) => field('concept', e.target.value)}
+                    placeholder={activeOpt === '1' ? 'High-density mixed-use clustered around transit nodes' : 'Moderate density organized around ecological corridors'}
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Description & Planning Narrative</label>
+                <textarea
+                  className="textarea"
+                  rows={3}
+                  value={form.description || ''}
+                  onChange={(e) => field('description', e.target.value)}
+                  placeholder="Detail the spatial hierarchy, target population, and urban structure…"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* ── 2. Design Decisions ── */}
+          <div className="card">
+            <div className="card-header">
+              <span className="card-title">Design Decisions & Spatial Parameters</span>
+            </div>
+
+            <div className="card-body" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
+              <div className="form-group">
+                <label className="form-label">Planning Strategy & Land Use</label>
+                <textarea
+                  className="textarea"
+                  rows={2}
+                  value={form.planning_strategy || ''}
+                  onChange={(e) => field('planning_strategy', e.target.value)}
+                  placeholder="Zoning distribution, mixed-use ratios, and public-to-private land allocation…"
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
+                <div className="form-group">
+                  <label className="form-label">Building Massing & Typologies</label>
+                  <textarea
+                    className="textarea"
+                    rows={2}
+                    value={form.buildings || ''}
+                    onChange={(e) => field('buildings', e.target.value)}
+                    placeholder="Height profiles (e.g. G+15 towers, G+6 mid-rise), podiums, and envelope setbacks…"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Open Space & Landscaping</label>
+                  <textarea
+                    className="textarea"
+                    rows={2}
+                    value={form.landscaping || ''}
+                    onChange={(e) => field('landscaping', e.target.value)}
+                    placeholder="Park networks, green buffers, rain gardens, and permeable surfaces…"
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
+                <div className="form-group">
+                  <label className="form-label">Transportation & Mobility Network</label>
+                  <textarea
+                    className="textarea"
+                    rows={2}
+                    value={form.transportation || ''}
+                    onChange={(e) => field('transportation', e.target.value)}
+                    placeholder="Transit corridors, street hierarchy, pedestrian paths, and bike networks…"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Density & FSI / FAR Decisions</label>
+                  <textarea
+                    className="textarea"
+                    rows={2}
+                    value={form.density || ''}
+                    onChange={(e) => field('density', e.target.value)}
+                    placeholder="Floor Space Index (FSI), ground coverage %, and unit densities…"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ── 3. Trade-offs & Evaluation ── */}
+          <div className="card">
+            <div className="card-header">
+              <span className="card-title">Comparative Merits & Trade-offs</span>
+            </div>
+
+            <div className="card-body">
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-4)' }}>
+                <div className="form-group">
+                  <label className="form-label" style={{ color: 'var(--green)' }}>Advantages & Strengths</label>
+                  <textarea
+                    className="textarea"
+                    rows={3}
+                    value={form.advantages || ''}
+                    onChange={(e) => field('advantages', e.target.value)}
+                    placeholder="Key benefits: transit access, spatial efficiency, economic viability…"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label" style={{ color: 'var(--amber)' }}>Trade-offs & Constraints</label>
+                  <textarea
+                    className="textarea"
+                    rows={3}
+                    value={form.tradeoffs || ''}
+                    onChange={(e) => field('tradeoffs', e.target.value)}
+                    placeholder="Compromises made: embodied carbon, shading, green footprint…"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ── 4. Visual Artifacts & Upload ── */}
+          <div className="card">
+            <div className="card-header">
+              <div>
+                <span className="card-title">Visual Artifacts & Diagrams</span>
+                <p className="card-subtitle">Upload architectural site diagrams or massing snapshots</p>
+              </div>
+            </div>
+
+            <div className="card-body">
+              {images.length > 0 && (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 'var(--space-4)', marginBottom: 'var(--space-4)' }}>
+                  {images.map((img, idx) => (
+                    <div
+                      key={idx}
+                      style={{
+                        position: 'relative',
+                        borderRadius: 'var(--radius-md)',
+                        overflow: 'hidden',
+                        border: '1px solid var(--border)',
+                        height: 120,
+                        background: '#0E1217',
+                      }}
+                    >
+                      <img src={img} alt={`Option ${activeOpt} visual ${idx + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <label className="upload-area" style={{ display: 'block' }}>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  style={{ display: 'none' }}
+                  disabled={uploading}
+                />
+                <Upload size={24} style={{ color: 'var(--blue)', margin: '0 auto var(--space-2)' }} />
+                <div style={{ fontWeight: 'var(--weight-semibold)', color: 'var(--text-primary)', fontSize: 'var(--text-sm)' }}>
+                  {uploading ? 'Uploading visual artifact…' : `Upload Diagram for Design Option ${activeOpt}`}
+                </div>
+                <div className="upload-area-text">PNG, JPG, or SVG up to 32MB</div>
+              </label>
+            </div>
+          </div>
+
+          {/* Save Button */}
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <button type="submit" className="btn btn-primary btn-lg" disabled={saving}>
+              {saving ? 'Saving…' : <><Save size={15} /> Save Design Option {activeOpt}</>}
+            </button>
+          </div>
+        </form>
+      )}
     </div>
   );
 }
