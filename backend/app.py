@@ -24,6 +24,7 @@ from routes.walkthrough import walkthrough_bp
 from routes.team import team_bp
 from routes.checklist import checklist_bp
 from routes.uploads import uploads_bp
+from routes.auth import auth_bp
 
 def create_app():
     app = Flask(__name__, static_folder=None)
@@ -35,9 +36,8 @@ def create_app():
     app.config["UPLOAD_FOLDER"] = upload_dir
     app.config["MAX_CONTENT_LENGTH"] = 32 * 1024 * 1024  # 32 MB
 
-    # Initialize database and seed demo
+    # Initialize database
     init_db()
-    seed_demo_project()
 
     # Register blueprints
     app.register_blueprint(auth_bp)

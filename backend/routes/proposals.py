@@ -27,10 +27,21 @@ def get_proposal(pid, prop_id):
 @proposals_bp.route("/<pid>/proposals/by-label/<label>", methods=["GET"])
 def get_proposal_by_label(pid, label):
     conn = get_db()
-    row = conn.execute("SELECT * FROM proposals WHERE project_id = ? AND label = ?", (pid, label.upper())).fetchone()
+    label_norm = label.strip().upper()
+    valid_labels = [label_norm]
+    if label_norm in ('1', 'A'):
+        valid_labels = ['1', 'A']
+    elif label_norm in ('2', 'B'):
+        valid_labels = ['2', 'B']
+
+    placeholders = ",".join("?" * len(valid_labels))
+    row = conn.execute(
+        f"SELECT * FROM proposals WHERE project_id = ? AND label IN ({placeholders}) LIMIT 1",
+        [pid] + valid_labels
+    ).fetchone()
     conn.close()
     if not row:
-        return error("Proposal not found", 404)
+        return error("Design option not found", 404)
     return success(row_to_dict(row))
 
 

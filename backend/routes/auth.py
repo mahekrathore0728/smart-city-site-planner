@@ -1,157 +1,153 @@
-"""
-Authentication Routes for UrbanPlan
-Supports Sign Up, Login, Current User check, and Logout
-"""
-import uuid
-from datetime import datetime, timezone
-from flask import Blueprint, request, jsonify
+import secrets
+import re
+from flask import Blueprint, request
 from werkzeug.security import generate_password_hash, check_password_hash
 from database import get_db
+from .helpers import now_iso, new_id, row_to_dict, success, error
 
-auth_bp = Blueprint("auth", __name__)
+auth_bp = Blueprint("auth", __name__, url_prefix="/api/auth")
 
-def now_iso():
-    return datetime.now(timezone.utc).isoformat()
 
-@auth_bp.route("/api/auth/signup", methods=["POST"])
+def is_valid_email(email: str) -> bool:
+    pattern = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
+    return bool(re.match(pattern, email.strip()))
+
+
+@auth_bp.route("/signup", methods=["POST"])
 def signup():
-    data = request.get_json() or {}
-    full_name = (data.get("full_name") or data.get("fullName") or "").strip()
-    email = (data.get("email") or "").strip().lower()
-    password = data.get("password") or ""
-
-    if not email or not password:
-        return jsonify({"ok": False, "error": "Email and password are required."}), 400
+    data = request.json or {}
+    full_name = data.get("full_name", "").strip()
+    email = data.get("email", "").strip().lower()
+    password = data.get("password", "")
+    confirm_password = data.get("confirm_password", "")
 
     if not full_name:
-        full_name = email.split("@")[0].capitalize()
+        return error("Full name is required", 422)
+    if not email or not is_valid_email(email):
+        return error("A valid email address is required", 422)
+    if not password:
+        return error("Password is required", 422)
+    if len(password) < 6:
+        return error("Password must be at least 6 characters long", 422)
+    if confirm_password and password != confirm_password:
+        return error("Passwords do not match", 422)
 
     conn = get_db()
-    c = conn.cursor()
-
-    existing = c.execute("SELECT id FROM users WHERE LOWER(email) = ?", (email,)).fetchone()
+    existing = conn.execute("SELECT id FROM users WHERE email = ?", (email,)).fetchone()
     if existing:
         conn.close()
-        return jsonify({"ok": False, "error": "An account with this email already exists."}), 400
+        return error("An account with this email already exists", 409)
 
-    user_id = f"usr_{uuid.uuid4().hex[:12]}"
-    pw_hash = generate_password_hash(password)
+    user_id = new_id()
+    token = secrets.token_hex(32)
     ts = now_iso()
+    pw_hash = generate_password_hash(password)
 
-    c.execute("""
-        INSERT INTO users (id, full_name, email, password_hash, created_at)
-        VALUES (?, ?, ?, ?, ?)
-    """, (user_id, full_name, email, pw_hash, ts))
+    conn.execute("""
+        INSERT INTO users (id, email, password_hash, full_name, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?)
+    """, (user_id, email, pw_hash, full_name, ts, ts))
+
+    conn.execute("""
+        INSERT INTO user_tokens (token, user_id, created_at)
+        VALUES (?, ?, ?)
+    """, (token, user_id, ts))
 
     conn.commit()
     conn.close()
 
-    token = f"token_{user_id}_{uuid.uuid4().hex[:8]}"
+    return success({
+        "user": {
+            "id": user_id,
+            "email": email,
+            "full_name": full_name,
+        },
+        "token": token
+    }, 201)
 
-    return jsonify({
-        "ok": True,
-        "data": {
-            "token": token,
-            "user": {
-                "id": user_id,
-                "full_name": full_name,
-                "email": email,
-                "created_at": ts
-            }
-        }
-    }), 201
 
-@auth_bp.route("/api/auth/login", methods=["POST"])
+@auth_bp.route("/login", methods=["POST"])
 def login():
-    data = request.get_json() or {}
-    email = (data.get("email") or "").strip().lower()
-    password = data.get("password") or ""
+    data = request.json or {}
+    email = data.get("email", "").strip().lower()
+    password = data.get("password", "")
 
     if not email or not password:
-        return jsonify({"ok": False, "error": "Email and password are required."}), 400
+        return error("Email and password are required", 422)
 
     conn = get_db()
-    c = conn.cursor()
+    user_row = conn.execute("SELECT * FROM users WHERE email = ?", (email,)).fetchone()
+    if not user_row:
+        conn.close()
+        return error("Invalid email or password", 401)
 
-    user = c.execute("SELECT * FROM users WHERE LOWER(email) = ?", (email,)).fetchone()
+    user = dict(user_row)
+    if not check_password_hash(user["password_hash"], password):
+        conn.close()
+        return error("Invalid email or password", 401)
+
+    token = secrets.token_hex(32)
+    ts = now_iso()
+    conn.execute("""
+        INSERT INTO user_tokens (token, user_id, created_at)
+        VALUES (?, ?, ?)
+    """, (token, user["id"], ts))
+    conn.commit()
     conn.close()
 
-    if not user:
-        return jsonify({"ok": False, "error": "Invalid email or password."}), 401
-
-    pw_hash = user["password_hash"]
-    # Check hashed password or plain text match for initial seed fallback
-    is_valid = check_password_hash(pw_hash, password) if pw_hash.startswith("pbkdf2:") or pw_hash.startswith("scrypt:") or pw_hash.startswith("argon2:") else (pw_hash == password or password == "urbanplan2026" or password == "password123")
-
-    if not is_valid:
-        return jsonify({"ok": False, "error": "Invalid email or password."}), 401
-
-    token = f"token_{user['id']}_{uuid.uuid4().hex[:8]}"
-
-    return jsonify({
-        "ok": True,
-        "data": {
-            "token": token,
-            "user": {
-                "id": user["id"],
-                "full_name": user["full_name"],
-                "email": user["email"],
-                "created_at": user["created_at"]
-            }
-        }
+    return success({
+        "user": {
+            "id": user["id"],
+            "email": user["email"],
+            "full_name": user["full_name"],
+        },
+        "token": token
     })
 
-@auth_bp.route("/api/auth/me", methods=["GET"])
-def get_current_user():
+
+@auth_bp.route("/me", methods=["GET"])
+def get_me():
     auth_header = request.headers.get("Authorization", "")
-    token = auth_header.replace("Bearer ", "").strip()
-
-    if not token or not token.startswith("token_usr_"):
-        # Return fallback guest user or 401
-        return jsonify({
-            "ok": True,
-            "data": {
-                "user": {
-                    "id": "usr_demo",
-                    "full_name": "Urban Planner",
-                    "email": "planner@urbanplan.io"
-                }
-            }
-        })
-
-    # Extract user ID from token
-    parts = token.split("_")
-    user_id = f"usr_{parts[2]}" if len(parts) >= 3 else "usr_demo"
+    if not auth_header.startswith("Bearer "):
+        return error("Authentication token required", 401)
+    token = auth_header.split(" ", 1)[1].strip()
 
     conn = get_db()
-    c = conn.cursor()
-    user = c.execute("SELECT id, full_name, email, created_at FROM users WHERE id = ?", (user_id,)).fetchone()
+    row = conn.execute("""
+        SELECT u.id, u.email, u.full_name, u.created_at
+        FROM users u
+        JOIN user_tokens t ON u.id = t.user_id
+        WHERE t.token = ?
+    """, (token,)).fetchone()
     conn.close()
 
-    if user:
-        return jsonify({
-            "ok": True,
-            "data": {
-                "user": {
-                    "id": user["id"],
-                    "full_name": user["full_name"],
-                    "email": user["email"],
-                    "created_at": user["created_at"]
-                }
-            }
-        })
+    if not row:
+        return error("Session expired or invalid token", 401)
 
-    return jsonify({
-        "ok": True,
-        "data": {
-            "user": {
-                "id": "usr_demo",
-                "full_name": "Urban Planner",
-                "email": "planner@urbanplan.io"
-            }
-        }
-    })
+    return success(dict(row))
 
-@auth_bp.route("/api/auth/logout", methods=["POST"])
+
+@auth_bp.route("/logout", methods=["POST"])
 def logout():
-    return jsonify({"ok": True, "data": {"message": "Logged out successfully"}})
+    auth_header = request.headers.get("Authorization", "")
+    if auth_header.startswith("Bearer "):
+        token = auth_header.split(" ", 1)[1].strip()
+        conn = get_db()
+        conn.execute("DELETE FROM user_tokens WHERE token = ?", (token,))
+        conn.commit()
+        conn.close()
+
+    return success({"message": "Logged out successfully"})
+
+
+@auth_bp.route("/forgot-password", methods=["POST"])
+def forgot_password():
+    data = request.json or {}
+    email = data.get("email", "").strip().lower()
+    if not email:
+        return error("Email is required", 422)
+
+    # Local prototype / workspace response
+    return success({
+        "message": f"If an account exists for {email}, password recovery instructions have been initiated. For local workspace mode, you can sign up with a new profile or reset via workspace admin."
+    })
