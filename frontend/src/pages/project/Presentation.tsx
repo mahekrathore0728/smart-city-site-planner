@@ -7,10 +7,10 @@ import type { PresentationSlide } from '../../types';
 
 const DEFAULT_TITLES = [
   'Site Context & Local Problems',
-  'Smart City Objectives & Data Sources',
-  'Proposal A — Planning Concept',
-  'Proposal B — Planning Concept',
-  'Forma Analysis Results',
+  'Planning Objectives & Data Sources',
+  'Design Option A — Planning Concept',
+  'Design Option B — Planning Concept',
+  'Site Analysis Results',
   'Final Concept Decision',
   'Implementation Plan & Impact',
 ];
@@ -80,8 +80,8 @@ export default function Presentation() {
     <div>
       <div className="page-header">
         <div>
-          <h1 className="page-title">Presentation Builder</h1>
-          <p className="page-subtitle">Organize your 5–7 slide SIH presentation</p>
+          <h1 className="page-title">Project Presentation</h1>
+          <p className="page-subtitle">Build your project deck for stakeholder and review meetings</p>
         </div>
         <div style={{ display:'flex', gap:'var(--space-3)', alignItems:'center' }}>
           <span className="badge badge-muted">{withContent}/{slides.length} slides with content</span>
@@ -89,7 +89,7 @@ export default function Presentation() {
       </div>
 
       <div className="info-banner info" style={{ marginBottom:'var(--space-6)' }}>
-        <Info size={15} style={{flexShrink:0}}/> Add content notes and upload slide images. Recommended: 5–7 slides covering site context, proposals, analyses, and final concept.
+        <Info size={15} style={{flexShrink:0}}/> Add content notes and upload slide images. Recommended: 5–7 slides covering site context, design options, analyses, and final concept.
       </div>
 
       <div style={{ display:'grid', gridTemplateColumns:'220px 1fr', gap:'var(--space-6)' }}>

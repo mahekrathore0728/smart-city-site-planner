@@ -35,24 +35,24 @@ export default function FinalConcept() {
     <div>
       <div className="page-header">
         <div>
-          <h1 className="page-title">Final Concept</h1>
-          <p className="page-subtitle">Select and document your final planning decision</p>
+          <h1 className="page-title">Final Concept & Strategy</h1>
+          <p className="page-subtitle">Document the selected spatial strategy and design rationale</p>
         </div>
       </div>
 
       <div className="info-banner info" style={{ marginBottom:'var(--space-6)' }}>
-        <Info size={15} style={{flexShrink:0}}/> The final decision must be human/team controlled. No AI-generated winner. Base your selection on actual Forma analysis evidence and planning judgment.
+        <Info size={15} style={{flexShrink:0}}/> The final selection must be expert/team controlled. Base your decision on quantitative analysis evidence, site constraints, and planning priorities.
       </div>
 
       <form onSubmit={handleSave} style={{ display:'flex', flexDirection:'column', gap:'var(--space-6)' }}>
         {/* Proposal selection */}
         <div className="card">
-          <div className="card-header"><span className="card-title">Select Final Proposal</span></div>
+          <div className="card-header"><span className="card-title">Select Final Design Option</span></div>
           <div className="card-body" style={{ display:'flex', flexDirection:'column', gap:'var(--space-3)' }}>
             {[
-              { val:'A', label:'Proposal A', sub:'Transit-Oriented Compact Development', accent:'var(--blue)' },
-              { val:'B', label:'Proposal B', sub:'Green-Blue Resilient Development', accent:'var(--green)' },
-              { val:'hybrid', label:'Hybrid / Refined Concept', sub:'Elements from both proposals combined', accent:'var(--purple)' },
+              { val:'A', label:'Design Option A', sub:'Transit-Oriented Compact Development', accent:'var(--blue)' },
+              { val:'B', label:'Design Option B', sub:'Green-Blue Resilient Development', accent:'var(--green)' },
+              { val:'hybrid', label:'Hybrid / Refined Concept', sub:'Elements from both design options combined', accent:'var(--purple)' },
             ].map(opt => {
               const selected = form.selected_proposal === opt.val;
               return (

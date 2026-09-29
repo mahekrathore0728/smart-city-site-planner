@@ -1,106 +1,314 @@
-import { useNavigate } from 'react-router-dom';
-import { MapPin, BarChart2, FileText, ArrowRight, ExternalLink } from 'lucide-react';
+import { ArrowRight, BarChart3, BookOpen, Leaf, Map, Layers3 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import './Landing.css';
 
+const workflow = [
+  {
+    number: '01',
+    icon: Map,
+    title: 'Site Context',
+    description: 'Define the site and understand its surroundings.',
+  },
+  {
+    number: '02',
+    icon: Layers3,
+    title: 'Design Options',
+    description: 'Develop alternative planning concepts.',
+  },
+  {
+    number: '03',
+    icon: BarChart3,
+    title: 'Environmental Analysis',
+    description: 'Evaluate environmental and spatial performance.',
+  },
+  {
+    number: '04',
+    icon: Leaf,
+    title: 'Final Concept',
+    description: 'Compare options and develop the selected concept.',
+  },
+];
+
+const capabilities = [
+  {
+    icon: Layers3,
+    title: 'SITE PLANNING',
+    description: 'Build and shape your site',
+  },
+  {
+    icon: BookOpen,
+    title: 'CONTEXT',
+    description: 'Understand the surroundings',
+  },
+  {
+    icon: BarChart3,
+    title: 'ANALYSIS',
+    description: 'Make data-driven decisions',
+  },
+  {
+    icon: Leaf,
+    title: 'DESIGN OPTIONS',
+    description: 'Explore and compare',
+  },
+];
+
 export default function Landing() {
-  const navigate = useNavigate();
   return (
-    <div className="landing">
+    <div className="landing-page">
       <header className="landing-nav">
-        <div className="landing-nav-brand">
-          <div className="landing-nav-logo">
-            <MapPin size={14} strokeWidth={2.5} />
+        <div className="landing-container landing-nav-inner">
+          <Link to="/" className="landing-brand">
+            <span className="brand-icon">
+              <Layers3 size={20} strokeWidth={2.4} />
+            </span>
+            <span>UrbanPlan</span>
+          </Link>
+
+          <nav className="landing-nav-links">
+            <a href="#process">Projects</a>
+            <a href="#process">Methodology</a>
+            <a href="#workspace">Resources</a>
+          </nav>
+
+          <div className="landing-nav-actions">
+            <Link to="/login" className="landing-login-link">
+              Login
+            </Link>
+            <Link to="/projects" className="landing-pill landing-pill-primary">
+              Open Planner
+              <ArrowRight size={16} />
+            </Link>
           </div>
-          <span>Smart City Site Planner</span>
-        </div>
-        <div className="landing-nav-actions">
-          <span className="badge badge-blue">SIH 26114</span>
-          <button className="btn btn-secondary btn-sm" onClick={() => navigate('/projects')}>View Projects</button>
-          <button className="btn btn-primary btn-sm" onClick={() => navigate('/projects/new')}>Start Project</button>
         </div>
       </header>
 
-      <main className="landing-hero">
-        {/* SVG urban planning map background */}
-        <svg className="landing-map-bg" viewBox="0 0 600 500" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          {/* Roads grid */}
-          <line x1="0" y1="120" x2="600" y2="120" stroke="#111" strokeWidth="8" opacity="0.4"/>
-          <line x1="0" y1="260" x2="600" y2="260" stroke="#111" strokeWidth="8" opacity="0.4"/>
-          <line x1="0" y1="400" x2="600" y2="400" stroke="#111" strokeWidth="8" opacity="0.4"/>
-          <line x1="120" y1="0" x2="120" y2="500" stroke="#111" strokeWidth="8" opacity="0.4"/>
-          <line x1="280" y1="0" x2="280" y2="500" stroke="#111" strokeWidth="8" opacity="0.4"/>
-          <line x1="440" y1="0" x2="440" y2="500" stroke="#111" strokeWidth="8" opacity="0.4"/>
-          {/* City blocks */}
-          <rect x="130" y="130" width="140" height="120" fill="#111" opacity="0.05"/>
-          <rect x="290" y="130" width="140" height="120" fill="#111" opacity="0.05"/>
-          <rect x="130" y="270" width="140" height="120" fill="#111" opacity="0.05"/>
-          <rect x="290" y="270" width="140" height="120" fill="#111" opacity="0.05"/>
-          <rect x="0" y="130" width="110" height="120" fill="#111" opacity="0.05"/>
-          <rect x="450" y="130" width="150" height="120" fill="#111" opacity="0.05"/>
-          <rect x="0" y="270" width="110" height="120" fill="#111" opacity="0.05"/>
-          {/* Buildings */}
-          {[140,160,180,200,220,240,300,320,340,360,380,400].map((x, i) => (
-            <rect key={i} x={x} y={140 + (i % 3) * 20} width="14" height={20 + (i % 4) * 8} fill="#111" opacity="0.15"/>
-          ))}
-          {/* Green spaces */}
-          <rect x="130" y="130" width="40" height="40" fill="#10B981" opacity="0.3" rx="2"/>
-          <rect x="380" y="280" width="50" height="50" fill="#10B981" opacity="0.3" rx="2"/>
-          <rect x="0" y="0" width="110" height="110" fill="#10B981" opacity="0.15" rx="2"/>
-          {/* Site boundary */}
-          <rect x="80" y="80" width="440" height="340" fill="none" stroke="#2563EB" strokeWidth="3" strokeDasharray="10 6" opacity="0.6" rx="4"/>
-          {/* Site label */}
-          <text x="90" y="75" fontSize="11" fill="#2563EB" fontWeight="600" opacity="0.7">SITE BOUNDARY · 2.5 km²</text>
-          {/* Transit line */}
-          <line x1="0" y1="260" x2="600" y2="260" stroke="#7C3AED" strokeWidth="4" opacity="0.5"/>
-          <circle cx="120" cy="260" r="8" fill="#7C3AED" opacity="0.6"/>
-          <circle cx="280" cy="260" r="8" fill="#7C3AED" opacity="0.6"/>
-          <circle cx="440" cy="260" r="8" fill="#7C3AED" opacity="0.6"/>
-        </svg>
-
-        <div className="landing-content">
-          <div className="landing-sih-badge">
-            <span className="badge badge-blue">SIH 26114 · Problem Statement</span>
-          </div>
-          <h1 className="landing-headline">
-            SMART CITY<br />SITE PLANNER
-          </h1>
-          <p className="landing-sub">
-            Design better places with data-driven site planning.<br/>
-            A professional command center for Autodesk Forma workflows.
-          </p>
-          <div className="landing-ctas">
-            <button className="btn btn-primary btn-xl" onClick={() => navigate('/projects/new')}>
-              Start Project <ArrowRight size={16} />
-            </button>
-            <button className="btn btn-secondary btn-xl" onClick={() => navigate('/projects')}>
-              View Projects
-            </button>
+      <main>
+        <section className="landing-hero">
+          <div className="landing-hero-image" aria-hidden="true">
+            <img
+              src="/images/city-masterplan-hero.jpg"
+              alt=""
+            />
           </div>
 
-          <div className="landing-features">
-            <div className="landing-feature">
-              <div className="landing-feature-icon"><MapPin size={18} /></div>
-              <div className="landing-feature-title">Forma Workflow Documentation</div>
-              <div className="landing-feature-desc">Track your Autodesk Forma site design progress step by step</div>
-            </div>
-            <div className="landing-feature">
-              <div className="landing-feature-icon"><BarChart2 size={18} /></div>
-              <div className="landing-feature-title">Analysis-Driven Decisions</div>
-              <div className="landing-feature-desc">Document all 8 Forma analyses with findings and design responses</div>
-            </div>
-            <div className="landing-feature">
-              <div className="landing-feature-icon"><FileText size={18} /></div>
-              <div className="landing-feature-title">Presentation Builder</div>
-              <div className="landing-feature-desc">Organize your 5–7 slide SIH presentation and Forma Board story</div>
+          <div className="landing-hero-overlay" />
+
+          <div className="landing-container landing-hero-inner">
+            <div className="landing-hero-content">
+              <p className="landing-eyebrow">
+                URBAN PLANNING / SMARTER CITIES
+              </p>
+
+              <h1>
+                Plan Better Places.
+                <br />
+                Design <span>Smarter Cities.</span>
+              </h1>
+
+              <p className="landing-hero-description">
+                A professional workspace for site planning, urban analysis and
+                design decisions.
+              </p>
+
+              <div className="landing-hero-actions">
+                <Link
+                  to="/projects/new"
+                  className="landing-pill landing-pill-primary landing-pill-large"
+                >
+                  Start a Project
+                  <ArrowRight size={17} />
+                </Link>
+
+                <Link
+                  to="/projects"
+                  className="landing-pill landing-pill-outline landing-pill-large"
+                >
+                  Explore Workspace
+                </Link>
+              </div>
             </div>
           </div>
-        </div>
+        </section>
+
+        <section className="landing-capability-strip">
+          <div className="landing-container capability-grid">
+            {capabilities.map(({ icon: Icon, title, description }) => (
+              <div className="capability-item" key={title}>
+                <div className="capability-icon">
+                  <Icon size={20} />
+                </div>
+
+                <div>
+                  <strong>{title}</strong>
+                  <span>{description}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section id="process" className="landing-section process-section">
+          <div className="landing-container">
+            <div className="section-heading">
+              <p className="landing-eyebrow">THE PROCESS</p>
+              <h2>From Site to Strategy</h2>
+              <p>
+                A simple connected workflow to turn your ideas into real,
+                data-backed urban solutions.
+              </p>
+            </div>
+
+            <div className="workflow-grid">
+              {workflow.map(({ number, icon: Icon, title, description }, index) => (
+                <div className="workflow-wrap" key={number}>
+                  <article className="workflow-card">
+                    <div className="workflow-icon">
+                      <Icon size={22} />
+                    </div>
+
+                    <div className="workflow-number">{number}</div>
+
+                    <h3>{title}</h3>
+                    <p>{description}</p>
+                  </article>
+
+                  {index < workflow.length - 1 && (
+                    <div className="workflow-arrow">→</div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section id="workspace" className="landing-section workspace-section">
+          <div className="landing-container workspace-grid">
+            <div className="workspace-copy">
+              <p className="landing-eyebrow">WORKSPACE PREVIEW</p>
+              <h2>One workspace for the complete planning process.</h2>
+              <p>
+                From site analysis to final design, everything you need is in
+                one place. Visualize, analyze, and make better decisions —
+                faster.
+              </p>
+
+              <ul className="workspace-features">
+                <li>Interactive 3D site planning</li>
+                <li>Environmental analysis</li>
+                <li>Design-option comparison</li>
+                <li>Structured project workflow</li>
+              </ul>
+            </div>
+
+            <div className="workspace-preview">
+              <div className="preview-sidebar">
+                <div className="preview-logo">
+                  <Layers3 size={16} />
+                  <span>UrbanPlan</span>
+                </div>
+                <span>Home</span>
+                <span>Site Design</span>
+                <span>Analysis</span>
+                <span>Board</span>
+                <span>Settings</span>
+              </div>
+
+              <div className="preview-main">
+                <div className="preview-map">
+                  <img src="/images/city-masterplan-hero.jpg" alt="" />
+                </div>
+
+                <div className="preview-analysis">
+                  <strong>Site Analysis</strong>
+                  {['Sun Hours', 'Daylight Potential', 'Microclimate', 'Wind Analysis', 'Noise', 'Solar Energy'].map(
+                    (item) => (
+                      <span key={item}>
+                        <i />
+                        {item}
+                      </span>
+                    )
+                  )}
+                </div>
+
+                <div className="preview-bottom">
+                  <div>
+                    <strong>Design Options</strong>
+                    <div className="preview-options">
+                      <div>Option 1</div>
+                      <div>Option 2</div>
+                    </div>
+                  </div>
+
+                  <div className="preview-metrics">
+                    <strong>Area Metrics</strong>
+                    <b>1.00 km²</b>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="landing-cta">
+          <div className="landing-cta-image" aria-hidden="true">
+            <img src="/images/city-masterplan-hero.jpg" alt="" />
+          </div>
+          <div className="landing-cta-overlay" />
+
+          <div className="landing-container landing-cta-inner">
+            <div>
+              <p className="landing-eyebrow">READY TO BUILD YOUR SMARTER CITY?</p>
+              <h2>Start shaping your next site.</h2>
+              <p>Turn site context into informed planning decisions.</p>
+
+              <Link
+                to="/projects/new"
+                className="landing-pill landing-pill-primary landing-pill-large"
+              >
+                Create Project
+                <ArrowRight size={17} />
+              </Link>
+            </div>
+
+            <div className="cta-tags">
+              <div>
+                <Leaf size={22} />
+                <strong>Sustainable</strong>
+                <span>More green. More resilient.</span>
+              </div>
+
+              <div>
+                <Layers3 size={22} />
+                <strong>People-Centric</strong>
+                <span>Better places. Healthier lives.</span>
+              </div>
+
+              <div>
+                <BarChart3 size={22} />
+                <strong>Future-Ready</strong>
+                <span>Built for what's next.</span>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
 
-      <footer className="landing-footer-note">
-        <ExternalLink size={12} style={{ display:'inline', verticalAlign:'middle', marginRight:4 }} />
-        A companion platform for the Autodesk Forma Site Design workflow · Not affiliated with Autodesk Inc.
-        &nbsp;·&nbsp; SIH Problem Statement 26114
+      <footer className="landing-footer">
+        <div className="landing-container landing-footer-inner">
+          <div className="landing-brand">
+            <span className="brand-icon">
+              <Layers3 size={18} />
+            </span>
+            <span>UrbanPlan</span>
+          </div>
+
+          <div className="footer-links">
+            <a href="#process">Site Planning</a>
+            <a href="#workspace">Workspace</a>
+            <a href="#process">Methodology</a>
+            <a href="#workspace">Resources</a>
+          </div>
+        </div>
       </footer>
     </div>
   );

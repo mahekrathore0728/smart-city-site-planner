@@ -53,8 +53,8 @@ export default function Team() {
     <div>
       <div className="page-header">
         <div>
-          <h1 className="page-title">Team Composition & Contribution</h1>
-          <p className="page-subtitle">Track team member roles, modules, and verified work contributions</p>
+          <h1 className="page-title">Team & Roles</h1>
+          <p className="page-subtitle">Manage project team members, roles, and assigned design responsibilities</p>
         </div>
         <button className="btn btn-primary" onClick={startAdd}><Plus size={15}/> Add Team Member</button>
       </div>
@@ -107,7 +107,7 @@ export default function Team() {
           <div className="empty-state">
             <Users size={36} className="empty-state-icon"/>
             <div className="empty-state-title">No team members added</div>
-            <p className="empty-state-desc">Add team members and detail their roles, module assignments, and contributions for SIH evaluation.</p>
+            <p className="empty-state-desc">Add team members and detail their roles, module assignments, and project contributions.</p>
             <button className="btn btn-primary mt-4" onClick={startAdd}><Plus size={14}/> Add First Member</button>
           </div>
         </div>

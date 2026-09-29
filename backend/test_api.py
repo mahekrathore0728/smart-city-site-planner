@@ -6,6 +6,7 @@ client = app.test_client()
 
 routes = [
     ('GET', '/api/health'),
+    ('GET', '/api/auth/me'),
     ('GET', '/api/projects'),
     ('GET', '/api/projects/demo-sih-26114'),
     ('GET', '/api/projects/demo-sih-26114/readiness'),

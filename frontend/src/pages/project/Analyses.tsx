@@ -81,14 +81,14 @@ export default function Analyses() {
     <div>
       <div className="page-header">
         <div>
-          <h1 className="page-title">8 Forma Analyses</h1>
-          <p className="page-subtitle">Document analysis findings and design responses for each proposal</p>
+          <h1 className="page-title">Site Analysis</h1>
+          <p className="page-subtitle">Document environmental, microclimate, and spatial analysis evidence</p>
         </div>
       </div>
 
-      <div className="info-banner warn" style={{ marginBottom:'var(--space-6)' }}>
-        <AlertTriangle size={15} style={{flexShrink:0}}/>
-        Run analyses in Autodesk Forma, then upload screenshots and enter your findings here. No results are generated automatically.
+      <div className="info-banner info" style={{ marginBottom:'var(--space-6)' }}>
+        <Info size={15} style={{flexShrink:0}}/>
+        Import analysis findings and visual evidence from external spatial analysis software (such as Autodesk Forma). Document findings and team design responses.
       </div>
 
       {/* Proposal selector */}
@@ -101,7 +101,7 @@ export default function Analyses() {
               style={{ display:'flex', alignItems:'center', gap:'var(--space-3)', padding:'var(--space-3) var(--space-5)', background:'var(--bg-panel)', border:`2px solid ${activeProp===l ? (l==='A'?'var(--blue)':'var(--green)') : 'var(--border)'}`, borderRadius:'var(--radius-lg)', cursor:'pointer', flex:1 }}>
               <div style={{ width:28, height:28, borderRadius:'var(--radius-md)', background:l==='A'?'var(--blue)':'var(--green)', display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', fontWeight:800, flexShrink:0 }}>{l}</div>
               <div style={{ textAlign:'left' }}>
-                <div style={{ fontWeight:'var(--weight-semibold)', fontSize:'var(--text-md)' }}>{prop?.name || `Proposal ${l}`}</div>
+                <div style={{ fontWeight:'var(--weight-semibold)', fontSize:'var(--text-md)' }}>{prop?.name || `Design Option ${l}`}</div>
                 <div style={{ fontSize:'var(--text-sm)', color:'var(--text-secondary)' }}>{reviewed}/8 analyses reviewed</div>
               </div>
             </button>
@@ -140,10 +140,10 @@ export default function Analyses() {
                     <span className="card-title">{ANALYSIS_LABELS[activeTab]}</span>
                     <div style={{ display:'flex', alignItems:'center', gap:'var(--space-2)' }}>
                       <div style={{ width:6, height:6, borderRadius:'50%', background: activeProp==='A'?'var(--blue)':'var(--green)' }}/>
-                      <span style={{ fontSize:'var(--text-sm)', color:'var(--text-secondary)' }}>Proposal {activeProp}</span>
+                      <span style={{ fontSize:'var(--text-sm)', color:'var(--text-secondary)' }}>Design Option {activeProp}</span>
                     </div>
                   </div>
-                  <p className="card-subtitle">Run this analysis in Autodesk Forma, then document your findings here</p>
+                  <p className="card-subtitle">Import or enter analysis findings and visual evidence for Design Option {activeProp}</p>
                 </div>
                 <span className={`analysis-status ${statusClass[currentAnalysis.status]}`}>
                   {ANALYSIS_STATUS_LABELS[currentAnalysis.status]}
@@ -171,7 +171,7 @@ export default function Analyses() {
                 <div style={{ display:'grid', gridTemplateColumns:'2fr 1fr', gap:'var(--space-4)' }}>
                   <div className="form-group">
                     <label className="form-label">Result Value</label>
-                    <input className="input" value={form.result_value||''} onChange={e=>setForm(f=>({...f,result_value:e.target.value}))} placeholder="Awaiting Forma result — do not fabricate"/>
+                    <input className="input" value={form.result_value||''} onChange={e=>setForm(f=>({...f,result_value:e.target.value}))} placeholder="Import or enter result value…"/>
                   </div>
                   <div className="form-group">
                     <label className="form-label">Unit</label>
@@ -181,17 +181,17 @@ export default function Analyses() {
 
                 {/* Finding → Design Response */}
                 <div className="form-group">
-                  <label className="form-label">Finding <span className="form-hint" style={{display:'inline',textTransform:'none',letterSpacing:'normal',fontWeight:400}}>— What did Forma show?</span></label>
-                  <textarea className="textarea" rows={3} value={form.finding||''} onChange={e=>setForm(f=>({...f,finding:e.target.value}))} placeholder="e.g. Some residential blocks receive reduced solar exposure due to adjacent towers…"/>
+                  <label className="form-label">Finding <span className="form-hint" style={{display:'inline',textTransform:'none',letterSpacing:'normal',fontWeight:400}}>— What did the analysis show?</span></label>
+                  <textarea className="textarea" rows={3} value={form.finding||''} onChange={e=>setForm(f=>({...f,finding:e.target.value}))} placeholder="e.g. Selected blocks experience daylight reduction due to orientation…"/>
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Design Response <span className="form-hint" style={{display:'inline',textTransform:'none',letterSpacing:'normal',fontWeight:400}}>— What did the team decide?</span></label>
-                  <textarea className="textarea" rows={3} value={form.design_response||''} onChange={e=>setForm(f=>({...f,design_response:e.target.value}))} placeholder="e.g. Building massing and orientation adjusted to improve solar access for affected blocks…"/>
+                  <label className="form-label">Design Response <span className="form-hint" style={{display:'inline',textTransform:'none',letterSpacing:'normal',fontWeight:400}}>— What design modification was made?</span></label>
+                  <textarea className="textarea" rows={3} value={form.design_response||''} onChange={e=>setForm(f=>({...f,design_response:e.target.value}))} placeholder="e.g. Building massing and setback adjusted to optimize solar access…"/>
                 </div>
 
                 {/* Evidence upload */}
                 <div className="form-group">
-                  <label className="form-label">Evidence (Forma Screenshot)</label>
+                  <label className="form-label">Analysis Evidence (Screenshot / Image)</label>
                   {form.evidence_image_path ? (
                     <div style={{ display:'flex', alignItems:'center', gap:'var(--space-3)' }}>
                       <img src={form.evidence_image_path} alt="Analysis evidence" style={{ height:80, width:120, objectFit:'cover', borderRadius:'var(--radius-md)', border:'1px solid var(--border)' }}/>
@@ -205,7 +205,7 @@ export default function Analyses() {
                       <input type="file" accept="image/*" style={{display:'none'}} onChange={handleUpload} disabled={uploading}/>
                       {uploading ? <div className="spinner"/> : <Upload size={20} color="var(--text-tertiary)"/>}
                       <div className="upload-area-text">
-                        {uploading ? 'Uploading…' : 'Click to upload Forma analysis screenshot'}
+                        {uploading ? 'Uploading…' : 'Click to upload analysis screenshot'}
                       </div>
                     </label>
                   )}

@@ -59,13 +59,13 @@ export default function WalkthroughPage() {
     <div>
       <div className="page-header">
         <div>
-          <h1 className="page-title">30-Second Walkthrough</h1>
-          <p className="page-subtitle">Upload or link your Autodesk Forma walkthrough video</p>
+          <h1 className="page-title">Project Walkthrough</h1>
+          <p className="page-subtitle">Upload or link a 3D video walkthrough of the site development</p>
         </div>
       </div>
 
       <div className="info-banner info" style={{ marginBottom:'var(--space-6)' }}>
-        <Info size={15} style={{flexShrink:0}}/> The walkthrough must be created in Autodesk Forma. Export the video and upload it here, or paste a link to a shared location. Target duration: 30 seconds.
+        <Info size={15} style={{flexShrink:0}}/> Provide a video walkthrough showcasing spatial layout, building orientation, transit links, and site features. Target duration: 30–60 seconds.
       </div>
 
       <form onSubmit={handleSave} style={{ display:'flex', flexDirection:'column', gap:'var(--space-6)' }}>

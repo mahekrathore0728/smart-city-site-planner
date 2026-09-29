@@ -8,8 +8,8 @@ import type { Proposal, ProposalMetric } from '../../types';
 interface Props { label: 'A' | 'B' }
 
 const TEMPLATES = {
-  A: { name:'Proposal A', concept:'Transit-Oriented Compact Development', description:'Higher density mixed-use development concentrated around transit nodes, with walkable streets and compact urban form.', planning_strategy:'Compact, high-density development gradient from transit core to periphery. Mixed-use zones with retail, office, and residential.', transportation:'Metro feeder buses, shared mobility hubs at transit nodes, elevated pedestrian walkways, cycle tracks.', buildings:'Mixed-use towers (G+15 to G+25) at transit nodes, mid-rise residential (G+6 to G+10) at periphery.', landscaping:'Linear green corridors along streets, rooftop gardens, pocket parks, tree-lined boulevards.', density:'High density at core (FSI 3.5–4.0), medium at periphery (FSI 1.5–2.0)', advantages:'High transit ridership potential, reduced car dependency, efficient land use, economic vitality.', tradeoffs:'Higher embodied carbon from dense construction, less ground-level green space, potential overshadowing.' },
-  B: { name:'Proposal B', concept:'Green-Blue Resilient Development', description:'Moderate density with emphasis on blue-green infrastructure, flood resilience, and urban cooling throughout the site.', planning_strategy:'Distributed moderate density with extensive green-blue network. Environmental resilience as primary organizing principle.', transportation:'Green mobility corridors, cycling infrastructure, pedestrian priority streets, low-speed zones.', buildings:'Low-to-mid-rise buildings (G+4 to G+10) distributed across site with generous green buffers between blocks.', landscaping:'Extensive green network: wetlands, rain gardens, linear parks, tree canopy, blue corridors.', density:'Moderate density throughout (FSI 1.5–2.5), more even distribution across site.', advantages:'Lower heat stress, flood resilience, better daylight access, biodiversity, community amenity.', tradeoffs:'Lower FAR means less housing/commercial capacity per unit area, may require larger site.' },
+  A: { name:'Design Option A', concept:'Transit-Oriented Compact Development', description:'Higher density mixed-use development concentrated around transit nodes, with walkable streets and compact urban form.', planning_strategy:'Compact, high-density development gradient from transit core to periphery. Mixed-use zones with retail, office, and residential.', transportation:'Metro feeder buses, shared mobility hubs at transit nodes, elevated pedestrian walkways, cycle tracks.', buildings:'Mixed-use towers (G+15 to G+25) at transit nodes, mid-rise residential (G+6 to G+10) at periphery.', landscaping:'Linear green corridors along streets, rooftop gardens, pocket parks, tree-lined boulevards.', density:'High density at core (FSI 3.5–4.0), medium at periphery (FSI 1.5–2.0)', advantages:'High transit ridership potential, reduced car dependency, efficient land use, economic vitality.', tradeoffs:'Higher embodied carbon from dense construction, less ground-level green space, potential overshadowing.' },
+  B: { name:'Design Option B', concept:'Green-Blue Resilient Development', description:'Moderate density with emphasis on blue-green infrastructure, flood resilience, and urban cooling throughout the site.', planning_strategy:'Distributed moderate density with extensive green-blue network. Environmental resilience as primary organizing principle.', transportation:'Green mobility corridors, cycling infrastructure, pedestrian priority streets, low-speed zones.', buildings:'Low-to-mid-rise buildings (G+4 to G+10) distributed across site with generous green buffers between blocks.', landscaping:'Extensive green network: wetlands, rain gardens, linear parks, tree canopy, blue corridors.', density:'Moderate density throughout (FSI 1.5–2.5), more even distribution across site.', advantages:'Lower heat stress, flood resilience, better daylight access, biodiversity, community amenity.', tradeoffs:'Lower FAR means less housing/commercial capacity per unit area, may require larger site.' },
 };
 
 export default function ProposalPage({ label }: Props) {
@@ -52,17 +52,17 @@ export default function ProposalPage({ label }: Props) {
     setSaving(true);
     const res = await api.proposals.update(projectId!, proposal.id, { ...form, metrics });
     setSaving(false);
-    if (res.ok) { setProposal(res.data); toast.success(`Proposal ${label} saved`); }
+    if (res.ok) { setProposal(res.data); toast.success(`Design Option ${label} saved`); }
     else toast.error(res.error);
   }
 
   function applyTemplate() {
     setForm(f => ({ ...f, ...tmpl }));
-    toast.info('Template applied — edit to match your actual proposal');
+    toast.info('Template applied — edit to match your actual design option');
   }
 
   if (loading) return <div className="loading-overlay"><div className="spinner"/></div>;
-  if (!proposal) return <div className="info-banner error">Proposal not found</div>;
+  if (!proposal) return <div className="info-banner error">Design option not found</div>;
 
   return (
     <div>
@@ -70,7 +70,7 @@ export default function ProposalPage({ label }: Props) {
         <div style={{ display:'flex', alignItems:'center', gap:'var(--space-3)' }}>
           <div style={{ width:36, height:36, borderRadius:'var(--radius-md)', background:accent, display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', fontWeight:800, fontSize:'var(--text-xl)', flexShrink:0 }}>{label}</div>
           <div>
-            <h1 className="page-title">Proposal {label}</h1>
+            <h1 className="page-title">Design Option {label}</h1>
             <p className="page-subtitle">{form.concept || tmpl.concept}</p>
           </div>
         </div>
@@ -81,18 +81,18 @@ export default function ProposalPage({ label }: Props) {
       </div>
 
       <div className="info-banner info" style={{ marginBottom:'var(--space-6)' }}>
-        <Info size={14} style={{flexShrink:0}}/> This proposal is completely independent from Proposal {other}. Data entered here does not affect the other proposal.
+        <Info size={14} style={{flexShrink:0}}/> This design option is evaluated independently from Design Option {other}. Data entered here represents option-specific planning decisions.
       </div>
 
       <form onSubmit={handleSave} style={{ display:'flex', flexDirection:'column', gap:'var(--space-6)' }}>
         {/* Concept */}
         <div className="card">
           <div className="card-header" style={{ borderTop:`3px solid ${accent}` }}>
-            <span className="card-title">Concept</span>
+            <span className="card-title">Concept & Vision</span>
           </div>
           <div className="card-body" style={{ display:'flex', flexDirection:'column', gap:'var(--space-4)' }}>
             <div className="form-group">
-              <label className="form-label">Proposal Name</label>
+              <label className="form-label">Design Option Name</label>
               <input className="input" value={form.name||''} onChange={e=>field('name',e.target.value)} placeholder={tmpl.name}/>
             </div>
             <div className="form-group">
@@ -186,7 +186,7 @@ export default function ProposalPage({ label }: Props) {
 
         <div style={{ display:'flex', justifyContent:'flex-end' }}>
           <button type="submit" className="btn btn-primary" disabled={saving}>
-            {saving ? <><div className="spinner" style={{width:14,height:14,borderWidth:2}}/> Saving…</> : <><Save size={15}/> Save Proposal {label}</>}
+            {saving ? <><div className="spinner" style={{width:14,height:14,borderWidth:2}}/> Saving…</> : <><Save size={15}/> Save Design Option {label}</>}
           </button>
         </div>
       </form>

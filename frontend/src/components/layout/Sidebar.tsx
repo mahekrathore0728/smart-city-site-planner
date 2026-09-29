@@ -4,7 +4,7 @@ import {
   CheckSquare, Building2, FileBarChart2, GitCompare,
   Layout, Cpu, Lightbulb, TrendingUp, Presentation,
   Video, Users, ClipboardList, ChevronRight, ArrowLeft,
-  MapIcon
+  MapIcon, Layers
 } from 'lucide-react';
 import { useAppStore } from '../../store/appStore';
 import './Sidebar.css';
@@ -18,41 +18,41 @@ interface NavItem {
 
 const NAV_GROUPS = [
   {
-    label: 'Project',
+    label: 'Project Workspace',
     items: [
       { key: '', icon: <LayoutDashboard size={15} />, label: 'Dashboard' },
       { key: 'site', icon: <MapPin size={15} />, label: 'Site & Location' },
-      { key: 'problems', icon: <AlertTriangle size={15} />, label: 'Local Problems' },
+      { key: 'problems', icon: <AlertTriangle size={15} />, label: 'Context & Problems' },
       { key: 'sources', icon: <Database size={15} />, label: 'Data Sources' },
       { key: 'objectives', icon: <Target size={15} />, label: 'Objectives' },
     ],
   },
   {
-    label: 'Forma Workflow',
+    label: 'Planning & Options',
     items: [
-      { key: 'forma', icon: <CheckSquare size={15} />, label: 'Forma Workflow' },
-      { key: 'proposals/a', icon: <Building2 size={15} />, label: 'Proposal A' },
-      { key: 'proposals/b', icon: <Building2 size={15} />, label: 'Proposal B' },
-      { key: 'analyses', icon: <FileBarChart2 size={15} />, label: '8 Analyses' },
-      { key: 'comparison', icon: <GitCompare size={15} />, label: 'Comparison' },
-      { key: 'forma-board', icon: <Layout size={15} />, label: 'Forma Board' },
+      { key: 'forma', icon: <CheckSquare size={15} />, label: 'Planning Workflow' },
+      { key: 'proposals/a', icon: <Building2 size={15} />, label: 'Design Option A' },
+      { key: 'proposals/b', icon: <Building2 size={15} />, label: 'Design Option B' },
+      { key: 'analyses', icon: <FileBarChart2 size={15} />, label: 'Site Analysis' },
+      { key: 'comparison', icon: <GitCompare size={15} />, label: 'Design Comparison' },
+      { key: 'forma-board', icon: <Layout size={15} />, label: 'Design Board' },
     ],
   },
   {
-    label: 'Revit & Output',
+    label: 'Building & Strategy',
     items: [
-      { key: 'revit', icon: <Cpu size={15} />, label: 'Revit Integration' },
+      { key: 'revit', icon: <Cpu size={15} />, label: 'Building Development' },
       { key: 'final', icon: <Lightbulb size={15} />, label: 'Final Concept' },
-      { key: 'impact', icon: <TrendingUp size={15} />, label: 'Impact' },
+      { key: 'impact', icon: <TrendingUp size={15} />, label: 'Impact & Strategy' },
     ],
   },
   {
-    label: 'Deliverables',
+    label: 'Deliverables & Readiness',
     items: [
-      { key: 'presentation', icon: <Presentation size={15} />, label: 'Presentation' },
-      { key: 'walkthrough', icon: <Video size={15} />, label: '30s Walkthrough' },
-      { key: 'team', icon: <Users size={15} />, label: 'Team' },
-      { key: 'checklist', icon: <ClipboardList size={15} />, label: 'SIH Checklist' },
+      { key: 'presentation', icon: <Presentation size={15} />, label: 'Project Presentation' },
+      { key: 'walkthrough', icon: <Video size={15} />, label: 'Project Walkthrough' },
+      { key: 'team', icon: <Users size={15} />, label: 'Team & Roles' },
+      { key: 'checklist', icon: <ClipboardList size={15} />, label: 'Project Readiness' },
     ],
   },
 ];
@@ -66,12 +66,12 @@ export default function Sidebar() {
     <aside className="sidebar" aria-label="Navigation">
       {/* Brand */}
       <div className="sidebar-brand" onClick={() => navigate('/projects')} role="button" tabIndex={0}>
-        <div className="sidebar-logo">
-          <MapIcon size={16} strokeWidth={2} />
+        <div className="sidebar-logo" style={{ background: 'var(--sage)' }}>
+          <Layers size={16} color="#0B0F0E" strokeWidth={2.5} />
         </div>
         <div className="sidebar-brand-text">
-          <span className="sidebar-brand-main">Smart City</span>
-          <span className="sidebar-brand-sub">Site Planner · SIH 26114</span>
+          <span className="sidebar-brand-main">UrbanPlan</span>
+          <span className="sidebar-brand-sub">Urban Planning Platform</span>
         </div>
       </div>
 
@@ -80,10 +80,7 @@ export default function Sidebar() {
         <div className="sidebar-project">
           <div className="sidebar-project-label">Active Project</div>
           <div className="sidebar-project-name">
-            {currentProject.is_demo && (
-              <span className="badge badge-demo" style={{ fontSize: '9px', marginBottom: 2 }}>DEMO</span>
-            )}
-            <span className="truncate">{currentProject.name}</span>
+            <span className="truncate">{currentProject.name.replace(/^\[DEMO\]\s*/i, '')}</span>
           </div>
           {currentProject.city && (
             <div className="sidebar-project-meta">
@@ -93,7 +90,7 @@ export default function Sidebar() {
           )}
           {currentProject.site_area_km2 < 1.0 && currentProject.site_area_km2 > 0 && (
             <div className="sidebar-area-warn">
-              ⚠ Site &lt; 1 km²
+              ⚠ Site &lt; 1.0 km²
             </div>
           )}
         </div>

@@ -1,20 +1,21 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, AlertTriangle, MapPin, Trash2, ArrowRight, FolderOpen } from 'lucide-react';
+import { Plus, AlertTriangle, MapPin, Trash2, ArrowRight, FolderOpen, Layers, User, LogOut } from 'lucide-react';
 import { api } from '../api/client';
-import { useToast } from '../store/appStore';
+import { useAppStore, useToast } from '../store/appStore';
 import type { Project } from '../types';
 
 const STAGE_LABELS: Record<string, string> = {
-  setup:'Setup', site:'Site', problems:'Problems', objectives:'Objectives',
-  forma_workflow:'Forma Workflow', proposals:'Proposals', analyses:'Analyses',
-  comparison:'Comparison', forma_board:'Forma Board', revit:'Revit',
+  setup:'Setup', site:'Site & Location', problems:'Context & Problems', objectives:'Objectives',
+  forma_workflow:'Planning Workflow', proposals:'Design Options', analyses:'Site Analysis',
+  comparison:'Design Comparison', forma_board:'Design Board', revit:'Building Development',
   final:'Final Concept', presentation:'Presentation', complete:'Complete',
 };
 
 export default function ProjectList() {
   const navigate = useNavigate();
   const toast = useToast();
+  const { user, logout } = useAppStore();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -37,31 +38,39 @@ export default function ProjectList() {
   }
 
   return (
-    <div style={{ minHeight:'100vh', background:'var(--bg-base)' }}>
+    <div style={{ minHeight:'100vh', background:'var(--bg-base)', color:'var(--text-primary)' }}>
       {/* Top nav */}
-      <header style={{ background:'#fff', borderBottom:'1px solid var(--border)', padding:'0 var(--space-8)', height:56, display:'flex', alignItems:'center', justifyContent:'space-between', position:'sticky', top:0, zIndex:10 }}>
-        <div style={{ display:'flex', alignItems:'center', gap:'var(--space-2)', fontWeight:600, fontSize:'var(--text-md)' }}>
-          <div style={{ width:26,height:26,background:'var(--blue)',borderRadius:'var(--radius-md)',display:'flex',alignItems:'center',justifyContent:'center',color:'#fff' }}>
-            <MapPin size={14} strokeWidth={2.5} />
+      <header style={{ background:'var(--bg-secondary)', borderBottom:'1px solid var(--border)', padding:'0 var(--space-8)', height:60, display:'flex', alignItems:'center', justifyContent:'space-between', position:'sticky', top:0, zIndex:10 }}>
+        <div style={{ display:'flex', alignItems:'center', gap:'var(--space-3)', fontWeight:700, fontSize:'var(--text-lg)', cursor:'pointer' }} onClick={() => navigate('/')}>
+          <div style={{ width:30, height:30, background:'var(--sage)', borderRadius:'var(--radius-md)', display:'flex', alignItems:'center', justifyContent:'center', color:'#0B0F0E' }}>
+            <Layers size={16} strokeWidth={2.5} />
           </div>
-          Smart City Site Planner
+          <span>UrbanPlan</span>
         </div>
         <div style={{ display:'flex', gap:'var(--space-3)', alignItems:'center' }}>
           <button className="btn btn-ghost btn-sm" onClick={() => navigate('/')}>Home</button>
           <button className="btn btn-primary btn-sm" onClick={() => navigate('/projects/new')}>
             <Plus size={14}/> New Project
           </button>
+          <div style={{ display:'flex', alignItems:'center', gap:8, marginLeft:12, paddingLeft:12, borderLeft:'1px solid var(--border)' }}>
+            <span style={{ fontSize:'var(--text-xs)', color:'var(--sage-light)', display:'flex', alignItems:'center', gap:4 }}>
+              <User size={13} /> {user?.full_name || 'Planner'}
+            </span>
+            <button className="btn btn-ghost btn-sm" onClick={logout} title="Sign Out">
+              <LogOut size={13} />
+            </button>
+          </div>
         </div>
       </header>
 
-      <div style={{ maxWidth:1000, margin:'0 auto', padding:'var(--space-10) var(--space-8)' }}>
+      <div style={{ maxWidth:1100, margin:'0 auto', padding:'var(--space-10) var(--space-8)' }}>
         <div className="page-header">
           <div>
-            <h1 className="page-title">Projects</h1>
-            <p className="page-subtitle">Your Smart City planning workspaces</p>
+            <h1 className="page-title">Urban Planning Projects</h1>
+            <p className="page-subtitle">Manage spatial design options, site context, and environmental analyses</p>
           </div>
           <button className="btn btn-primary" onClick={() => navigate('/projects/new')}>
-            <Plus size={15}/> New Project
+            <Plus size={15}/> Create Project
           </button>
         </div>
 
@@ -103,8 +112,7 @@ export default function ProjectList() {
                   <tr key={p.id} style={{cursor:'pointer'}} onClick={() => navigate(`/projects/${p.id}`)}>
                     <td>
                       <div style={{display:'flex', alignItems:'center', gap:'var(--space-2)', flexWrap:'wrap'}}>
-                        {p.is_demo && <span className="badge badge-demo">DEMO</span>}
-                        <span style={{fontWeight:'var(--weight-medium)'}}>{p.name}</span>
+                        <span style={{fontWeight:'var(--weight-medium)'}}>{p.name.replace(/^\[DEMO\]\s*/i, '')}</span>
                       </div>
                     </td>
                     <td style={{color:'var(--text-secondary)'}}>
@@ -115,7 +123,7 @@ export default function ProjectList() {
                         {p.site_area_km2 > 0 ? (
                           <>
                             <span className="text-mono">{p.site_area_km2.toFixed(2)} km²</span>
-                            {p.site_area_km2 < 1.0 && <AlertTriangle size={13} color="var(--amber)" title="Below 1 km² minimum"/>}
+                            {p.site_area_km2 < 1.0 && <span title="Below 1.0 km² minimum"><AlertTriangle size={13} color="var(--amber)"/></span>}
                           </>
                         ) : <span style={{color:'var(--text-tertiary)'}}>—</span>}
                       </div>
@@ -131,11 +139,9 @@ export default function ProjectList() {
                         <button className="btn btn-secondary btn-sm" onClick={() => navigate(`/projects/${p.id}`)}>
                           Open <ArrowRight size={12}/>
                         </button>
-                        {!p.is_demo && (
-                          <button className="btn btn-icon" onClick={() => handleDelete(p)} title="Delete project" aria-label="Delete">
-                            <Trash2 size={14} color="var(--red)"/>
-                          </button>
-                        )}
+                        <button className="btn btn-icon" onClick={() => handleDelete(p)} title="Delete project" aria-label="Delete">
+                          <Trash2 size={14} color="var(--red)"/>
+                        </button>
                       </div>
                     </td>
                   </tr>

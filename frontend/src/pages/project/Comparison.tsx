@@ -40,15 +40,15 @@ export default function Comparison() {
     <div>
       <div className="page-header">
         <div>
-          <h1 className="page-title">Proposal Comparison</h1>
-          <p className="page-subtitle">Side-by-side analysis of Proposal A and Proposal B</p>
+          <h1 className="page-title">Design Comparison</h1>
+          <p className="page-subtitle">Side-by-side evaluation of Design Option A and Design Option B</p>
         </div>
       </div>
 
       {(!propA?.concept || !propB?.concept) && (
         <div className="info-banner warn" style={{ marginBottom:'var(--space-6)' }}>
-          One or both proposals are incomplete. <button className="btn btn-ghost btn-sm" onClick={() => navigate(`/projects/${projectId}/proposals/a`)}>Complete Proposal A</button>
-          <button className="btn btn-ghost btn-sm" onClick={() => navigate(`/projects/${projectId}/proposals/b`)}>Complete Proposal B</button>
+          One or both design options are incomplete. <button className="btn btn-ghost btn-sm" onClick={() => navigate(`/projects/${projectId}/proposals/a`)}>Complete Design Option A</button>
+          <button className="btn btn-ghost btn-sm" onClick={() => navigate(`/projects/${projectId}/proposals/b`)}>Complete Design Option B</button>
         </div>
       )}
 
@@ -63,7 +63,7 @@ export default function Comparison() {
               <div key={l} style={{ padding:'var(--space-5)', borderRight: l==='A' ? '1px solid var(--border)' : 'none', borderTop:`3px solid ${accent}` }}>
                 <div style={{ display:'flex', alignItems:'center', gap:'var(--space-2)', marginBottom:'var(--space-1)' }}>
                   <div style={{ width:24,height:24,borderRadius:'var(--radius-sm)',background:accent,display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontWeight:800,fontSize:'var(--text-md)' }}>{l}</div>
-                  <span style={{ fontWeight:'var(--weight-bold)', fontSize:'var(--text-lg)' }}>{prop?.name || `Proposal ${l}`}</span>
+                  <span style={{ fontWeight:'var(--weight-bold)', fontSize:'var(--text-lg)' }}>{prop?.name || `Design Option ${l}`}</span>
                 </div>
                 <div style={{ color:'var(--text-secondary)', fontSize:'var(--text-sm)' }}>{prop?.concept || 'Not yet defined'}</div>
               </div>
@@ -80,8 +80,8 @@ export default function Comparison() {
             <thead>
               <tr>
                 <th style={{ width:180 }}>Dimension</th>
-                <th>Proposal A</th>
-                <th>Proposal B</th>
+                <th>Design Option A</th>
+                <th>Design Option B</th>
               </tr>
             </thead>
             <tbody>
@@ -99,16 +99,16 @@ export default function Comparison() {
 
       {/* Analysis comparison */}
       <div className="card" style={{ overflow:'hidden' }}>
-        <div className="card-header"><span className="card-title">Forma Analysis Comparison</span></div>
+        <div className="card-header"><span className="card-title">Site Analysis Comparison</span></div>
         <div style={{ overflowX:'auto' }}>
           <table className="table">
             <thead>
               <tr>
                 <th style={{ width:180 }}>Analysis</th>
-                <th>Proposal A — Finding</th>
-                <th>Proposal A — Status</th>
-                <th>Proposal B — Finding</th>
-                <th>Proposal B — Status</th>
+                <th>Option A — Finding</th>
+                <th>Option A — Status</th>
+                <th>Option B — Finding</th>
+                <th>Option B — Status</th>
               </tr>
             </thead>
             <tbody>
@@ -119,7 +119,7 @@ export default function Comparison() {
                   <tr key={type}>
                     <td style={{ fontWeight:'var(--weight-medium)', whiteSpace:'nowrap' }}>{ANALYSIS_LABELS[type]}</td>
                     <td style={{ fontSize:'var(--text-sm)', color:'var(--text-secondary)', maxWidth:200 }}>
-                      {anA?.finding || <span style={{color:'var(--amber)', fontStyle:'italic', fontSize:'var(--text-xs)'}}>Awaiting Forma Result</span>}
+                      {anA?.finding || <span style={{color:'var(--amber)', fontStyle:'italic', fontSize:'var(--text-xs)'}}>Awaiting Result</span>}
                     </td>
                     <td>
                       {anA ? (
@@ -129,7 +129,7 @@ export default function Comparison() {
                       ) : NA}
                     </td>
                     <td style={{ fontSize:'var(--text-sm)', color:'var(--text-secondary)', maxWidth:200 }}>
-                      {anB?.finding || <span style={{color:'var(--amber)', fontStyle:'italic', fontSize:'var(--text-xs)'}}>Awaiting Forma Result</span>}
+                      {anB?.finding || <span style={{color:'var(--amber)', fontStyle:'italic', fontSize:'var(--text-xs)'}}>Awaiting Result</span>}
                     </td>
                     <td>
                       {anB ? (

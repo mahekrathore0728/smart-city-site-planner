@@ -55,16 +55,16 @@ export default function CreateProject() {
   }
 
   return (
-    <div style={{ minHeight:'100vh', background:'var(--bg-base)' }}>
-      <header style={{ background:'#fff', borderBottom:'1px solid var(--border)', padding:'0 var(--space-8)', height:56, display:'flex', alignItems:'center', gap:'var(--space-3)', position:'sticky', top:0, zIndex:10 }}>
+    <div style={{ minHeight:'100vh', background:'var(--bg-base)', color:'var(--text-primary)' }}>
+      <header style={{ background:'var(--bg-secondary)', borderBottom:'1px solid var(--border)', padding:'0 var(--space-8)', height:60, display:'flex', alignItems:'center', gap:'var(--space-3)', position:'sticky', top:0, zIndex:10 }}>
         <button className="btn btn-ghost btn-icon" onClick={() => navigate('/projects')} aria-label="Back">
           <ArrowLeft size={16}/>
         </button>
-        <div style={{ display:'flex', alignItems:'center', gap:'var(--space-2)', fontWeight:600, fontSize:'var(--text-md)' }}>
-          <div style={{ width:26,height:26,background:'var(--blue)',borderRadius:'var(--radius-md)',display:'flex',alignItems:'center',justifyContent:'center',color:'#fff' }}>
+        <div style={{ display:'flex', alignItems:'center', gap:'var(--space-2)', fontWeight:700, fontSize:'var(--text-md)', cursor:'pointer' }} onClick={() => navigate('/projects')}>
+          <div style={{ width:26,height:26,background:'var(--sage)',borderRadius:'var(--radius-md)',display:'flex',alignItems:'center',justifyContent:'center',color:'#0B0F0E' }}>
             <MapPin size={14} strokeWidth={2.5} />
           </div>
-          Smart City Site Planner
+          UrbanPlan
         </div>
         <span style={{color:'var(--border-strong)',margin:'0 4px'}}>/</span>
         <span style={{color:'var(--text-secondary)', fontSize:'var(--text-base)'}}>New Project</span>
@@ -75,8 +75,8 @@ export default function CreateProject() {
           <button className="btn btn-ghost btn-sm" onClick={() => navigate('/projects')} style={{marginBottom:'var(--space-4)', paddingLeft:0}}>
             <ArrowLeft size={13}/> All Projects
           </button>
-          <h1 className="page-title">New Smart City Project</h1>
-          <p className="page-subtitle">Create a workspace to document your site planning workflow, proposals, and analyses.</p>
+          <h1 className="page-title">New Urban Development Project</h1>
+          <p className="page-subtitle">Create a workspace to manage your site planning, design options, and site analyses.</p>
         </div>
 
         <form onSubmit={handleSubmit} noValidate>
@@ -87,7 +87,7 @@ export default function CreateProject() {
             <div className="card-body" style={{ display:'flex', flexDirection:'column', gap:'var(--space-5)' }}>
               <div className="form-group">
                 <label className="form-label" htmlFor="name">Project Name <span style={{color:'var(--red)'}}>*</span></label>
-                <input id="name" className={`input ${errors.name?'error':''}`} value={form.name} onChange={e=>set('name',e.target.value)} placeholder="e.g. Pune Smart City Corridor" autoFocus />
+                <input id="name" className={`input ${errors.name?'error':''}`} value={form.name} onChange={e=>set('name',e.target.value)} placeholder="e.g. Pune Mixed-Use Development" autoFocus />
                 {errors.name && <span className="form-error">{errors.name}</span>}
               </div>
               <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'var(--space-4)' }}>
@@ -114,10 +114,10 @@ export default function CreateProject() {
                 {areaBelow && (
                   <div className="info-banner warn" style={{marginTop:'var(--space-2)'}}>
                     <AlertTriangle size={15} style={{flexShrink:0, marginTop:1}}/>
-                    <span>Site area is below the SIH minimum of 1.0 km². You can still create the project but it will not qualify as competition-ready.</span>
+                    <span>Site area is below the recommended minimum of 1.0 km² for regional site planning.</span>
                   </div>
                 )}
-                {!areaBelow && <span className="form-hint">Minimum 1.0 km² required for SIH submission</span>}
+                {!areaBelow && <span className="form-hint">Minimum 1.0 km² recommended for regional master planning</span>}
               </div>
               <div className="form-group">
                 <label className="form-label" htmlFor="org">Planning Organization</label>

@@ -136,7 +136,7 @@
 }
 .sidebar-link.active {
   background: var(--bg-nav-active);
-  color: #93C5FD;
+  color: var(--sage-light);
 }
 .sidebar-link.active::before {
   content: '';
@@ -145,7 +145,7 @@
   top: 0;
   bottom: 0;
   width: 2px;
-  background: var(--blue);
+  background: var(--sage);
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
 }
 

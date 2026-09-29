@@ -1,7 +1,21 @@
 import { create } from 'zustand';
-import type { Project, ToastMessage } from '../types';
+import type { AuthUser, Project, ToastMessage } from '../types';
+
+const storedToken = typeof window !== 'undefined' ? localStorage.getItem('urbanplan_token') : null;
+const storedUserJson = typeof window !== 'undefined' ? localStorage.getItem('urbanplan_user') : null;
+let parsedUser: AuthUser | null = null;
+if (storedUserJson) {
+  try { parsedUser = JSON.parse(storedUserJson); } catch { parsedUser = null; }
+}
 
 interface AppStore {
+  // Authentication
+  user: AuthUser | null;
+  token: string | null;
+  isAuthenticated: boolean;
+  login: (token: string, user: AuthUser) => void;
+  logout: () => void;
+
   // Current project
   currentProject: Project | null;
   setCurrentProject: (p: Project | null) => void;
@@ -23,6 +37,20 @@ interface AppStore {
 let toastCounter = 0;
 
 export const useAppStore = create<AppStore>((set) => ({
+  user: parsedUser || (storedToken ? { id: 'usr_demo', full_name: 'Urban Planner', email: 'planner@urbanplan.io' } : null),
+  token: storedToken,
+  isAuthenticated: Boolean(storedToken),
+  login: (token, user) => {
+    localStorage.setItem('urbanplan_token', token);
+    localStorage.setItem('urbanplan_user', JSON.stringify(user));
+    set({ token, user, isAuthenticated: true });
+  },
+  logout: () => {
+    localStorage.removeItem('urbanplan_token');
+    localStorage.removeItem('urbanplan_user');
+    set({ token: null, user: null, isAuthenticated: false, currentProject: null });
+  },
+
   currentProject: null,
   setCurrentProject: (p) => set({ currentProject: p }),
 

@@ -1,6 +1,9 @@
-// ============================================================
-// Smart City Site Planner — TypeScript Types
-// ============================================================
+export interface AuthUser {
+  id: string;
+  full_name: string;
+  email: string;
+  created_at?: string;
+}
 
 export interface Project {
   id: string;
@@ -275,10 +278,10 @@ export const ANALYSIS_STATUS_LABELS: Record<AnalysisStatus, string> = {
 };
 
 export const PROVENANCE_LABELS: Record<AnalysisProvenance, string> = {
-  forma: 'Actual Forma Result',
+  forma: 'External Analysis Result',
   user: 'User Entered Result',
-  assumption: 'Documented Assumption',
-  reference: 'Reference / Source Data',
+  assumption: 'Planning Assumption',
+  reference: 'Reference / Guideline Standard',
 };
 
 export const PROBLEM_CATEGORY_LABELS: Record<ProblemCategory, string> = {
@@ -291,15 +294,15 @@ export const PROBLEM_CATEGORY_LABELS: Record<ProblemCategory, string> = {
   other: 'Other',
 };
 
-export const SIH_CHECKLIST_LABELS: Record<string, string> = {
-  site_area: 'Site Area ≥ 1 km²',
-  site_limits: 'Site Limits Defined',
-  context: 'Contextual Data Added',
-  landscaping: 'Landscaping Included',
-  buildings: 'Buildings Modeled',
-  transportation: 'Transportation Network',
-  proposal_a: 'Proposal A Created',
-  proposal_b: 'Proposal B Created',
+export const PROJECT_READINESS_LABELS: Record<string, string> = {
+  site_area: 'Site Area Requirement (≥ 1.0 km²)',
+  site_limits: 'Site Limits & Boundary Defined',
+  context: 'Contextual Data & Environment',
+  landscaping: 'Landscaping Strategy Included',
+  buildings: 'Building Typology & Massing',
+  transportation: 'Transportation & Mobility Network',
+  proposal_a: 'Design Option A Concept Complete',
+  proposal_b: 'Design Option B Concept Complete',
   analysis_area: 'Area Metrics Analysis',
   analysis_carbon: 'Embodied Carbon Analysis',
   analysis_sun: 'Sun Hours Analysis',
@@ -308,13 +311,15 @@ export const SIH_CHECKLIST_LABELS: Record<string, string> = {
   analysis_microclimate: 'Microclimate Analysis',
   analysis_noise: 'Noise Analysis',
   analysis_solar: 'Solar Energy Analysis',
-  forma_board: 'Forma Board Comparison',
-  office_building: 'Office Building Identified',
-  revit_export: 'Revit Export Completed',
-  revit_detailing: 'Revit Detailing Done',
-  revit_sync: 'Revit → Forma Sync-Back',
-  rendered_images: 'Rendered Images',
-  walkthrough_30s: '30-Second Walkthrough Video',
-  presentation_ppt: '5–7 Slide Presentation',
-  final_review: 'Final Review Complete',
+  forma_board: 'Design Board Comparison',
+  office_building: 'Primary Commercial Building Defined',
+  revit_export: 'Detailed BIM Export Completed',
+  revit_detailing: 'Building Detailing Completed',
+  revit_sync: 'BIM Site Model Sync-Back',
+  rendered_images: 'Rendered Project Visuals',
+  walkthrough_30s: 'Project Walkthrough Video',
+  presentation_ppt: 'Project Presentation Deck',
+  final_review: 'Final Planning Review Complete',
 };
+
+export const SIH_CHECKLIST_LABELS = PROJECT_READINESS_LABELS;

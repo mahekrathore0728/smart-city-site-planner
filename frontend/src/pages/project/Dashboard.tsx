@@ -41,23 +41,23 @@ export default function Dashboard() {
 
   // Next task recommendation
   const items = readiness?.items ?? {};
-  const nextTask = !items.site_area ? 'Set site area ≥ 1 km²'
-    : !items.local_problems ? 'Document local planning problems'
-    : !items.objectives ? 'Define Smart City objectives'
-    : !items.proposal_a ? 'Complete Proposal A concept'
-    : !items.proposal_b ? 'Complete Proposal B concept'
-    : !items.analyses_a ? 'Upload Forma analysis evidence'
-    : !items.final_concept ? 'Select final concept'
-    : !items.presentation ? 'Complete presentation slides'
-    : 'Review SIH compliance checklist';
+  const nextTask = !items.site_area ? 'Set site area ≥ 1.0 km²'
+    : !items.local_problems ? 'Document site context & local problems'
+    : !items.objectives ? 'Define planning objectives'
+    : !items.proposal_a ? 'Complete Design Option A concept'
+    : !items.proposal_b ? 'Complete Design Option B concept'
+    : !items.analyses_a ? 'Upload site analysis evidence'
+    : !items.final_concept ? 'Select final concept & strategy'
+    : !items.presentation ? 'Complete project presentation slides'
+    : 'Review project readiness checklist';
 
   const sections = [
     { label:'Site Setup', icon:<MapPin size={16}/>, path:'site', done: items.site_area && items.site_boundary, note: p.site_area_km2 > 0 ? `${p.site_area_km2} km²` : 'Area not set' },
-    { label:'Proposals', icon:<Layout size={16}/>, path:'proposals/a', done: items.proposal_a && items.proposal_b, note: [items.proposal_a && 'A', items.proposal_b && 'B'].filter(Boolean).join(' + ') || 'Not started' },
-    { label:'Analyses', icon:<BarChart2 size={16}/>, path:'analyses', done: analysesReviewed >= 8, note: `${analysesUploaded}/16 with evidence` },
-    { label:'Forma Workflow', icon:<CheckCircle size={16}/>, path:'forma', done: formaComplete >= 12, note: `${formaComplete}/12 steps` },
-    { label:'Revit Integration', icon:<Cpu size={16}/>, path:'revit', done: items.revit_workflow, note: items.revit_workflow ? 'In progress' : 'Not started' },
-    { label:'Presentation', icon:<FileText size={16}/>, path:'presentation', done: items.presentation, note: items.presentation ? '5+ slides ready' : 'Not started' },
+    { label:'Design Options', icon:<Layout size={16}/>, path:'proposals/a', done: items.proposal_a && items.proposal_b, note: [items.proposal_a && 'Option A', items.proposal_b && 'Option B'].filter(Boolean).join(' + ') || 'Not started' },
+    { label:'Site Analysis', icon:<BarChart2 size={16}/>, path:'analyses', done: analysesReviewed >= 8, note: `${analysesUploaded}/16 with evidence` },
+    { label:'Planning Workflow', icon:<CheckCircle size={16}/>, path:'forma', done: formaComplete >= 12, note: `${formaComplete}/12 steps` },
+    { label:'Building Development', icon:<Cpu size={16}/>, path:'revit', done: items.revit_workflow, note: items.revit_workflow ? 'In progress' : 'Not started' },
+    { label:'Project Presentation', icon:<FileText size={16}/>, path:'presentation', done: items.presentation, note: items.presentation ? '5+ slides ready' : 'Not started' },
   ];
 
   return (
@@ -67,13 +67,12 @@ export default function Dashboard() {
         <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:'var(--space-4)', flexWrap:'wrap' }}>
           <div>
             <div style={{ display:'flex', alignItems:'center', gap:'var(--space-3)', marginBottom:'var(--space-2)', flexWrap:'wrap' }}>
-              {p.is_demo && <span className="badge badge-demo">DEMO / SAMPLE PROJECT</span>}
               <span className="badge badge-muted">{p.stage}</span>
               {p.site_area_km2 < 1.0 && p.site_area_km2 > 0 && (
-                <span className="badge badge-amber"><AlertTriangle size={10}/> Site &lt; 1 km²</span>
+                <span className="badge badge-amber"><AlertTriangle size={10}/> Site &lt; 1.0 km²</span>
               )}
             </div>
-            <h1 style={{ fontSize:'var(--text-3xl)', fontWeight:800, letterSpacing:'-0.02em', color:'var(--text-primary)', lineHeight:1.2 }}>{p.name}</h1>
+            <h1 style={{ fontSize:'var(--text-3xl)', fontWeight:800, letterSpacing:'-0.02em', color:'var(--text-primary)', lineHeight:1.2 }}>{p.name.replace(/^\[DEMO\]\s*/i, '')}</h1>
             {(p.city || p.location_name) && (
               <div style={{ display:'flex', alignItems:'center', gap:'var(--space-2)', marginTop:'var(--space-2)', color:'var(--text-secondary)', fontSize:'var(--text-base)' }}>
                 <MapPin size={13}/>
@@ -84,26 +83,16 @@ export default function Dashboard() {
             {p.planning_org && <div style={{ color:'var(--text-tertiary)', fontSize:'var(--text-sm)', marginTop:'var(--space-1)' }}>{p.planning_org}</div>}
           </div>
           <button className="btn btn-secondary btn-sm" onClick={() => navigate(`/projects/${projectId}/checklist`)}>
-            <ClipboardList size={14}/> SIH Checklist
+            <ClipboardList size={14}/> Project Readiness
           </button>
         </div>
       </div>
-
-      {/* Demo banner */}
-      {p.is_demo && (
-        <div className="info-banner demo" style={{ marginBottom:'var(--space-6)' }}>
-          <Info size={16} style={{flexShrink:0, marginTop:1}}/>
-          <div>
-            <strong>DEMO / SAMPLE PROJECT</strong> — This is a demonstration workspace for SIH 26114. All content is illustrative. No analysis results have been fabricated from Autodesk Forma. Replace with your actual project data. Analysis fields are marked "Evidence Required" — upload real Forma screenshots.
-          </div>
-        </div>
-      )}
 
       {/* Site area warning */}
       {p.site_area_km2 > 0 && p.site_area_km2 < 1.0 && (
         <div className="info-banner warn" style={{ marginBottom:'var(--space-6)' }}>
           <AlertTriangle size={16} style={{flexShrink:0}}/>
-          <span>Site area ({p.site_area_km2} km²) is below the SIH minimum of 1.0 km². Update site area to qualify as competition-ready.</span>
+          <span>Site area ({p.site_area_km2} km²) is below the recommended minimum of 1.0 km² for regional site planning.</span>
           <button className="btn btn-secondary btn-sm" style={{marginLeft:'auto'}} onClick={() => navigate(`/projects/${projectId}/site`)}>Update Site</button>
         </div>
       )}
@@ -112,7 +101,7 @@ export default function Dashboard() {
       <div style={{ display:'grid', gridTemplateColumns:'200px 1fr', gap:'var(--space-6)', marginBottom:'var(--space-6)', alignItems:'start' }}>
         {/* Readiness score */}
         <div className="card" style={{ textAlign:'center', padding:'var(--space-6)' }}>
-          <div style={{ fontSize:'var(--text-xs)', fontWeight:600, color:'var(--text-tertiary)', letterSpacing:'var(--tracking-widest)', textTransform:'uppercase', marginBottom:'var(--space-4)' }}>Readiness</div>
+          <div style={{ fontSize:'var(--text-xs)', fontWeight:600, color:'var(--text-tertiary)', letterSpacing:'var(--tracking-widest)', textTransform:'uppercase', marginBottom:'var(--space-4)' }}>Project Readiness</div>
           <div style={{ position:'relative', width:90, height:90, margin:'0 auto var(--space-4)' }}>
             <svg viewBox="0 0 90 90" style={{ position:'absolute', inset:0, transform:'rotate(-90deg)' }}>
               <circle cx="45" cy="45" r="38" fill="none" stroke="var(--border)" strokeWidth="7"/>
@@ -125,7 +114,7 @@ export default function Dashboard() {
               <span style={{ fontSize:'var(--text-xl)', fontWeight:800, color:'var(--text-primary)' }}>{score}%</span>
             </div>
           </div>
-          <div style={{ fontSize:'var(--text-sm)', color:'var(--text-secondary)' }}>{readiness?.passed ?? 0}/{readiness?.total ?? 14} requirements</div>
+          <div style={{ fontSize:'var(--text-sm)', color:'var(--text-secondary)' }}>{readiness?.passed ?? 0}/{readiness?.total ?? 14} requirements met</div>
         </div>
 
         {/* Section cards grid */}
@@ -172,10 +161,10 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Forma Workflow quick status */}
+      {/* Workflow quick status */}
       <div className="card">
         <div className="card-header">
-          <span className="card-title">Forma Workflow Status</span>
+          <span className="card-title">Planning Workflow Progress</span>
           <button className="btn btn-ghost btn-sm" onClick={() => navigate(`/projects/${projectId}/forma`)}>
             View All <ArrowRight size={12}/>
           </button>

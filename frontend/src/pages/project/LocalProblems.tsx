@@ -61,8 +61,8 @@ export default function LocalProblems() {
     <div>
       <div className="page-header">
         <div>
-          <h1 className="page-title">Local Problems</h1>
-          <p className="page-subtitle">Document the planning challenges this site faces</p>
+          <h1 className="page-title">Context & Problems</h1>
+          <p className="page-subtitle">Document the site context, environmental challenges, and planning issues</p>
         </div>
         <button className="btn btn-primary" onClick={startAdd}><Plus size={15}/> Add Problem</button>
       </div>

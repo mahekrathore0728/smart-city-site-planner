@@ -59,20 +59,20 @@ export default function RevitIntegration() {
     <div>
       <div className="page-header">
         <div>
-          <h1 className="page-title">Revit Integration</h1>
-          <p className="page-subtitle">Document your Forma → Revit → Forma sync workflow</p>
+          <h1 className="page-title">Building Development</h1>
+          <p className="page-subtitle">Track detailed building massing, BIM integration, and detailed design workflow</p>
         </div>
       </div>
 
-      <div className="info-banner warn" style={{ marginBottom:'var(--space-4)' }}>
-        <AlertTriangle size={15} style={{flexShrink:0}}/>
+      <div className="info-banner info" style={{ marginBottom:'var(--space-4)' }}>
+        <Info size={15} style={{flexShrink:0}}/>
         <div>
-          <strong>Work is performed in Autodesk Revit and Forma.</strong> This platform documents your workflow progress — it does not perform Revit operations or Forma sync.
+          <strong>Detailed architectural modeling is performed in BIM/CAD environments.</strong> This platform tracks workflow progress, evidence, and design integration.
         </div>
       </div>
 
       <div className="forma-notice" style={{ marginBottom:'var(--space-6)', padding:'var(--space-3) var(--space-4)', fontSize:'var(--text-sm)' }}>
-        <Info size={13}/> Workflow: <strong>Forma Massing → Export → Revit Detailing → Sync Back → Re-run Forma Analysis</strong>
+        <Info size={13}/> Workflow: <strong>Initial Massing → Detailed BIM Modeling → Integration → Performance Re-evaluation</strong>
       </div>
 
       <form onSubmit={handleSave} style={{ display:'flex', flexDirection:'column', gap:'var(--space-6)' }}>

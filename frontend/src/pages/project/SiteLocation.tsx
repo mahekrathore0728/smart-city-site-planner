@@ -101,10 +101,10 @@ export default function SiteLocation() {
               <input id="area" type="number" min="0" step="0.01" className="input" value={areaStr} onChange={e => setAreaStr(e.target.value)} placeholder="e.g. 2.5"/>
               {areaWarn && (
                 <div className="info-banner warn" style={{marginTop:'var(--space-2)'}}>
-                  <AlertTriangle size={14} style={{flexShrink:0}}/> Site area below SIH minimum of 1.0 km². Project will not be marked competition-ready.
+                  <AlertTriangle size={14} style={{flexShrink:0}}/> Site area is below the recommended minimum of 1.0 km² for regional site planning.
                 </div>
               )}
-              {!areaWarn && <span className="form-hint">Minimum 1.0 km² required for SIH 26114</span>}
+              {!areaWarn && <span className="form-hint">Minimum 1.0 km² recommended for regional master planning</span>}
             </div>
             <div className="form-group">
               <label className="form-label" htmlFor="org">Planning Organization</label>
@@ -126,13 +126,13 @@ export default function SiteLocation() {
           <div className="card-header">
             <div>
               <span className="card-title">Site Design Completeness</span>
-              <p className="card-subtitle">Track the four mandatory site design elements (Forma workflow)</p>
+              <p className="card-subtitle">Track the four primary site design elements</p>
             </div>
             {allDone && <span className="badge badge-green">All Complete</span>}
           </div>
           <div className="card-body" style={{display:'flex', flexDirection:'column', gap:'var(--space-3)'}}>
             <div className="info-banner info" style={{marginBottom:'var(--space-2)'}}>
-              <Info size={14} style={{flexShrink:0}}/> These elements are completed in Autodesk Forma. Mark them as done here to track progress.
+              <Info size={14} style={{flexShrink:0}}/> These elements are modeled in external spatial planning tools (such as Autodesk Forma). Track progress here.
             </div>
             {completionFlags.map(f => {
               const done = Boolean(site[f.key]);
@@ -158,12 +158,12 @@ export default function SiteLocation() {
           <div className="card-header">
             <div>
               <span className="card-title">Project Documentation Map</span>
-              <p className="card-subtitle">Visual reference map — distinct from Autodesk Forma site model</p>
+              <p className="card-subtitle">Visual reference map for project documentation</p>
             </div>
           </div>
           <div className="card-body">
             <div className="info-banner info" style={{marginBottom:'var(--space-4)'}}>
-              <Info size={14} style={{flexShrink:0}}/> This is a <strong>documentation map</strong> for reference only. Your actual site model is built in Autodesk Forma.
+              <Info size={14} style={{flexShrink:0}}/> This is a <strong>spatial reference map</strong>. The detailed site model is developed in external modeling tools.
             </div>
             <div style={{ height:360, background:'var(--bg-muted)', borderRadius:'var(--radius-lg)', border:'1px solid var(--border)', display:'flex', alignItems:'center', justifyContent:'center', flexDirection:'column', gap:'var(--space-3)', color:'var(--text-tertiary)' }}>
               <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" opacity="0.4">

@@ -1,13 +1,18 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import AppShell from './components/layout/AppShell';
 import ToastStack from './components/ui/ToastStack';
+import ProtectedRoute from './components/auth/ProtectedRoute';
 
-// Pages
+// Public Auth & Landing Pages
 import Landing from './pages/Landing';
+import Login from './pages/Login';
+import SignUp from './pages/SignUp';
+
+// Workspace Pages
 import ProjectList from './pages/ProjectList';
 import CreateProject from './pages/CreateProject';
 
-// Project pages
+// Project Pages
 import Dashboard from './pages/project/Dashboard';
 import SiteLocation from './pages/project/SiteLocation';
 import LocalProblems from './pages/project/LocalProblems';
@@ -30,13 +35,38 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public */}
+        {/* Public Routes */}
         <Route path="/" element={<Landing />} />
-        <Route path="/projects" element={<ProjectList />} />
-        <Route path="/projects/new" element={<CreateProject />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<SignUp />} />
 
-        {/* Project workspace */}
-        <Route path="/projects/:projectId" element={<AppShell />}>
+        {/* Protected Dashboard & Project List */}
+        <Route
+          path="/projects"
+          element={
+            <ProtectedRoute>
+              <ProjectList />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/projects/new"
+          element={
+            <ProtectedRoute>
+              <CreateProject />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Protected Project Workspace */}
+        <Route
+          path="/projects/:projectId"
+          element={
+            <ProtectedRoute>
+              <AppShell />
+            </ProtectedRoute>
+          }
+        >
           <Route index element={<Dashboard />} />
           <Route path="site" element={<SiteLocation />} />
           <Route path="problems" element={<LocalProblems />} />

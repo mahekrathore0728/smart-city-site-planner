@@ -9,8 +9,11 @@ async function request<T>(
   options?: RequestInit
 ): Promise<{ ok: true; data: T } | { ok: false; error: string }> {
   try {
+    const token = localStorage.getItem('urbanplan_token');
+    const authHeaders: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
+
     const res = await fetch(`${BASE}${path}`, {
-      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      headers: { 'Content-Type': 'application/json', ...authHeaders, ...options?.headers },
       ...options,
     });
 
@@ -56,13 +59,22 @@ export const health = () => get<{ status: string }>('/health');
 
 // ── Projects ──
 import type {
-  Project, SiteInfo, LocalProblem, DataSource, Objective,
+  AuthUser, Project, SiteInfo, LocalProblem, DataSource, Objective,
   Proposal, Analysis, FormaWorkflowStep, RevitWorkflow,
   FormaBoardFrame, FinalConcept, PresentationSlide, Walkthrough,
   TeamMember, ChecklistItem, ReadinessReport
 } from '../types';
 
 export const api = {
+  // Auth
+  auth: {
+    login: (credentials: { email: string; password: string }) =>
+      post<{ token: string; user: AuthUser }>('/auth/login', credentials),
+    signup: (data: { full_name?: string; email: string; password: string }) =>
+      post<{ token: string; user: AuthUser }>('/auth/signup', data),
+    me: () => get<{ user: AuthUser }>('/auth/me'),
+    logout: () => post<{ message: string }>('/auth/logout', {}),
+  },
   // Projects
   projects: {
     list: () => get<Project[]>('/projects'),

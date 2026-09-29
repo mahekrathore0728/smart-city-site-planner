@@ -59,18 +59,18 @@ export default function FormaWorkflow() {
     <div>
       <div className="page-header">
         <div>
-          <h1 className="page-title">Forma Workflow</h1>
-          <p className="page-subtitle">Track your Autodesk Forma site design progress</p>
+          <h1 className="page-title">Planning Workflow</h1>
+          <p className="page-subtitle">Track step-by-step spatial design and site analysis progress</p>
         </div>
       </div>
 
       {/* Critical boundary notice */}
-      <div className="info-banner warn" style={{ marginBottom:'var(--space-4)' }}>
+      <div className="info-banner info" style={{ marginBottom:'var(--space-4)' }}>
         <AlertTriangle size={15} style={{flexShrink:0}}/>
         <div>
-          <strong>Work is performed in Autodesk Forma.</strong> This checklist tracks your progress — it does not perform any Forma operations.
+          <strong>Work is performed in external planning software (such as Autodesk Forma).</strong> Track workflow milestones, decisions, and evidence here.
           <a href="https://forma.autodesk.com" target="_blank" rel="noopener noreferrer" style={{ marginLeft:8, color:'var(--blue)', display:'inline-flex', alignItems:'center', gap:3 }}>
-            Open Autodesk Forma <ExternalLink size={11}/>
+            Open External Tool <ExternalLink size={11}/>
           </a>
         </div>
       </div>

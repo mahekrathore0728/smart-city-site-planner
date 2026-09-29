@@ -67,8 +67,8 @@ export default function SIHChecklist() {
     <div>
       <div className="page-header">
         <div>
-          <h1 className="page-title">SIH Compliance Checklist</h1>
-          <p className="page-subtitle">Track the 25 official SIH 26114 problem statement requirements</p>
+          <h1 className="page-title">Project Readiness Checklist</h1>
+          <p className="page-subtitle">Track project deliverables, site standards, and quality requirements</p>
         </div>
         <button className="btn btn-primary" onClick={handleSave} disabled={saving}>
           {saving ? <><div className="spinner" style={{width:14,height:14,borderWidth:2}}/> Saving…</> : <><Save size={15}/> Save Checklist</>}
@@ -79,7 +79,7 @@ export default function SIHChecklist() {
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'var(--space-3)' }}>
           <div style={{ display:'flex', alignItems:'center', gap:'var(--space-2)' }}>
             <ShieldCheck size={18} color="var(--blue)" />
-            <span style={{ fontWeight:'var(--weight-semibold)', fontSize:'var(--text-md)' }}>Overall Compliance Score</span>
+            <span style={{ fontWeight:'var(--weight-semibold)', fontSize:'var(--text-md)' }}>Overall Readiness Score</span>
           </div>
           <span style={{ fontWeight:700, fontSize:'var(--text-lg)', color:'var(--blue)' }}>{pct}% ({completedCount}/{total})</span>
         </div>

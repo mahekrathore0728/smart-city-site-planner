@@ -1,26 +1,26 @@
-import { useNavigate, useParams } from 'react-router-dom';
-import { Menu, ExternalLink } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Menu, ExternalLink, LogOut, User } from 'lucide-react';
 import { useAppStore } from '../../store/appStore';
 import './TopBar.css';
 
 const STAGE_LABELS: Record<string, string> = {
   setup: 'Setup',
   site: 'Site',
-  problems: 'Problems',
+  problems: 'Context & Problems',
   objectives: 'Objectives',
-  forma_workflow: 'Forma Workflow',
-  proposals: 'Proposals',
-  analyses: 'Analyses',
-  comparison: 'Comparison',
-  forma_board: 'Forma Board',
-  revit: 'Revit',
+  forma_workflow: 'Planning Workflow',
+  proposals: 'Design Options',
+  analyses: 'Site Analysis',
+  comparison: 'Design Comparison',
+  forma_board: 'Design Board',
+  revit: 'Building Development',
   final: 'Final Concept',
-  presentation: 'Presentation',
+  presentation: 'Project Presentation',
   complete: 'Complete',
 };
 
 export default function TopBar() {
-  const { currentProject, setSidebarOpen, sidebarOpen } = useAppStore();
+  const { currentProject, setSidebarOpen, sidebarOpen, user, logout } = useAppStore();
   const navigate = useNavigate();
 
   return (
@@ -44,11 +44,8 @@ export default function TopBar() {
             </button>
             <span className="breadcrumb-sep">/</span>
             <span className="breadcrumb-current">
-              {currentProject.name}
+              {currentProject.name.replace(/^\[DEMO\]\s*/i, '')}
             </span>
-            {currentProject.is_demo && (
-              <span className="badge badge-demo" style={{ marginLeft: 8 }}>DEMO</span>
-            )}
           </nav>
         )}
       </div>
@@ -72,6 +69,16 @@ export default function TopBar() {
           <ExternalLink size={13} />
           Autodesk Forma
         </a>
+
+        <div className="topbar-user">
+          <span className="topbar-user-name">
+            <User size={13} /> {user?.full_name || 'Planner'}
+          </span>
+          <button className="btn btn-ghost btn-sm" onClick={logout} title="Sign Out">
+            <LogOut size={13} />
+            Sign Out
+          </button>
+        </div>
       </div>
     </header>
   );

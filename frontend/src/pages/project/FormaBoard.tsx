@@ -75,13 +75,13 @@ export default function FormaBoard() {
     <div>
       <div className="page-header">
         <div>
-          <h1 className="page-title">Forma Board Story</h1>
-          <p className="page-subtitle">Organize content for your Forma Board presentation</p>
+          <h1 className="page-title">Design Board</h1>
+          <p className="page-subtitle">Organize visual frames and decision narratives for project reviews</p>
         </div>
       </div>
 
       <div className="info-banner info" style={{ marginBottom:'var(--space-6)' }}>
-        <Info size={15} style={{flexShrink:0}}/> This organizes content for your actual Forma Board in Autodesk Forma. It does not create or publish to Forma Board directly.
+        <Info size={15} style={{flexShrink:0}}/> This structures visual frames and design documentation for team reviews and client presentations. It does not publish directly to external CAD software.
       </div>
 
       {/* Frame navigation */}

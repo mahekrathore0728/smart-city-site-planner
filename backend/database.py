@@ -23,6 +23,14 @@ def init_db():
     c = conn.cursor()
 
     c.executescript("""
+    CREATE TABLE IF NOT EXISTS users (
+        id TEXT PRIMARY KEY,
+        full_name TEXT NOT NULL,
+        email TEXT UNIQUE NOT NULL,
+        password_hash TEXT NOT NULL,
+        created_at TEXT
+    );
+
     CREATE TABLE IF NOT EXISTS projects (
         id TEXT PRIMARY KEY,
         name TEXT NOT NULL,
@@ -291,6 +299,15 @@ def seed_demo_project():
 
     ts = now_iso()
 
+    # Default User
+    from werkzeug.security import generate_password_hash
+    user_exists = c.execute("SELECT id FROM users WHERE email = 'planner@urbanplan.io'").fetchone()
+    if not user_exists:
+        c.execute("""
+            INSERT INTO users (id, full_name, email, password_hash, created_at)
+            VALUES (?, ?, ?, ?, ?)
+        """, ("usr_demo", "Urban Planner", "planner@urbanplan.io", generate_password_hash("urbanplan2026"), ts))
+
     # Project
     c.execute("""
         INSERT INTO projects (id, name, city, state, location_name, site_area_km2,
@@ -298,15 +315,13 @@ def seed_demo_project():
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         DEMO_PROJECT_ID,
-        "[DEMO] Pune Smart City Corridor",
+        "Pune Mixed-Use Development",
         "Pune", "Maharashtra",
         "Hinjewadi–Wakad Corridor, Pune",
         2.5,
         json.dumps({"lat": 18.5912, "lng": 73.7390, "zoom": 14}),
-        "DEMO / SAMPLE DATA — This is a demonstration project for SIH 26114. "
-        "Replace with your actual project details. No analysis results in this demo "
-        "are fabricated from Forma.",
-        "Pune Municipal Corporation / PCMC (Demo)",
+        "Sample urban site planning project for Hinjewadi–Wakad mixed-use corridor in Pune.",
+        "Pune Municipal Corporation / PMRDA",
         "forma_workflow",
         1,
         ts, ts
@@ -324,22 +339,22 @@ def seed_demo_project():
             [18.5870, 73.7450], [18.5870, 73.7350]
         ]),
         1, 1, 1, 1,
-        "DEMO: Hinjewadi–Wakad corridor — major IT hub with poor last-mile connectivity and urban heat stress.",
+        "Hinjewadi–Wakad corridor — major IT hub with poor last-mile connectivity and urban heat stress.",
         "Pune Metropolitan Region, adjacent to IT parks and residential zones. Pimpri-Chinchwad Municipal Corporation area.",
         ts
     ))
 
     # Local problems
     problems = [
-        ("demo-p1", "Traffic Congestion on NH-48", "Severe peak-hour congestion between Hinjewadi IT Park and Wakad node.", "mobility", "high", "PCMC Traffic Survey 2023 (Demo Reference)"),
-        ("demo-p2", "Urban Heat Island Effect", "Surface temperatures significantly higher than surrounding rural areas due to impervious surfaces.", "environment", "high", "IMD / ISRO Bhuvan Land Surface Temperature Data (Demo Reference)"),
-        ("demo-p3", "Lack of Green Space", "Green coverage below recommended norms. No accessible public parks in 1 km radius.", "environment", "medium", "Pune Master Plan 2041 (Demo Reference)"),
+        ("demo-p1", "Traffic Congestion on NH-48", "Severe peak-hour congestion between Hinjewadi IT Park and Wakad node.", "mobility", "high", "PCMC Traffic Survey 2023"),
+        ("demo-p2", "Urban Heat Island Effect", "Surface temperatures significantly higher than surrounding rural areas due to impervious surfaces.", "environment", "high", "IMD / ISRO Bhuvan Land Surface Temperature Data"),
+        ("demo-p3", "Lack of Green Space", "Green coverage below recommended norms. No accessible public parks in 1 km radius.", "environment", "medium", "Pune Master Plan 2041"),
     ]
     for pid, title, desc, cat, sev, src in problems:
         c.execute("""
             INSERT INTO local_problems (id, project_id, title, description, category, severity, source, notes, created_at)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (pid, DEMO_PROJECT_ID, title, desc, cat, sev, src, "DEMO / SAMPLE", ts))
+        """, (pid, DEMO_PROJECT_ID, title, desc, cat, sev, src, "", ts))
 
     # Data sources
     sources = [
@@ -351,13 +366,13 @@ def seed_demo_project():
         c.execute("""
             INSERT INTO data_sources (id, project_id, name, url, description, date_accessed, geographic_scope, notes, created_at)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (sid, DEMO_PROJECT_ID, name, url, desc, date, scope, "DEMO", ts))
+        """, (sid, DEMO_PROJECT_ID, name, url, desc, date, scope, "", ts))
 
     # Objectives
     objectives = [
-        ("demo-o1", "Improve Last-Mile Connectivity", "Reduce travel time from transit nodes to IT parks and residential areas.", "Reduce last-mile travel time by 30% from baseline (DEMO target — enter verified value)", "Pune Metro Phase 2 alignment"),
-        ("demo-o2", "Reduce Urban Heat Stress", "Increase green and blue coverage to lower surface temperatures.", "Achieve 30% green coverage across site (DEMO target — enter verified value)", "IGBC Green Master Plan guidelines"),
-        ("demo-o3", "Improve Walkability", "Create pedestrian-priority streets and secure footpaths connecting key destinations.", "Walkability score above 60 on Walk Score index (DEMO target)", "National Urban Transport Policy"),
+        ("demo-o1", "Improve Last-Mile Connectivity", "Reduce travel time from transit nodes to IT parks and residential areas.", "Reduce last-mile travel time by 30% from baseline", "Pune Metro Phase 2 alignment"),
+        ("demo-o2", "Reduce Urban Heat Stress", "Increase green and blue coverage to lower surface temperatures.", "Achieve 30% green coverage across site", "IGBC Green Master Plan guidelines"),
+        ("demo-o3", "Improve Walkability", "Create pedestrian-priority streets and secure footpaths connecting key destinations.", "Walkability score above 60 on Walk Score index", "National Urban Transport Policy"),
     ]
     for oid, name, desc, target, rationale in objectives:
         c.execute("""
@@ -369,10 +384,10 @@ def seed_demo_project():
     proposals_data = [
         (
             "demo-prop-a", DEMO_PROJECT_ID, "A",
-            "Proposal A",
+            "Design Option A",
             "Transit-Oriented Compact Development",
             "Higher density mixed-use development concentrated around transit nodes, walkable streets, and compact urban form.",
-            "DEMO: Proposal A focuses on compact, transit-oriented development with density gradient from transit core to periphery.",
+            "Design Option A focuses on compact, transit-oriented development with density gradient from transit core to periphery.",
             "Metro feeder buses, shared mobility hubs at transit nodes, elevated pedestrian walkways",
             "Mixed-use towers (G+15 to G+25) at transit nodes, mid-rise residential at periphery",
             "Linear green corridors along streets, rooftop gardens, pocket parks",
@@ -382,10 +397,10 @@ def seed_demo_project():
         ),
         (
             "demo-prop-b", DEMO_PROJECT_ID, "B",
-            "Proposal B",
+            "Design Option B",
             "Green-Blue Resilient Development",
             "Moderate density with emphasis on blue-green infrastructure, flood resilience, and urban cooling.",
-            "DEMO: Proposal B prioritizes environmental resilience with distributed green-blue network and lower building density.",
+            "Design Option B prioritizes environmental resilience with distributed green-blue network and lower building density.",
             "Green mobility corridors, cycling infrastructure, pedestrian priority streets",
             "Low-to-mid-rise buildings (G+4 to G+10), distributed across site with green buffers",
             "Extensive green network: wetlands, rain gardens, linear parks, tree canopy",
@@ -400,7 +415,7 @@ def seed_demo_project():
                 planning_strategy, transportation, buildings, landscaping, density,
                 advantages, tradeoffs, notes, status, metrics, images, created_at, updated_at)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (*p, "DEMO / SAMPLE DATA", "draft",
+        """, (*p, "", "draft",
               json.dumps([]), json.dumps([]), ts, ts))
 
     # Analyses — all marked as evidence_required, no fabricated numbers
@@ -420,48 +435,48 @@ def seed_demo_project():
                 aid, DEMO_PROJECT_ID, proposal_id, atype,
                 None, None, None, None,
                 "evidence_required", "user", None,
-                None, "DEMO: Run actual Forma analysis and upload evidence here.", ts
+                None, "Run site analysis and upload verified evidence.", ts
             ))
 
     # Forma workflow steps
     forma_steps = [
-        (1, "Create Site in Forma", "Log in to Autodesk Forma and create new site project"),
+        (1, "Create Site Model", "Create site boundaries and contextual GIS data"),
         (2, "Define Site Limits", "Draw site boundary polygon >= 1.0 km²"),
         (3, "Add Contextual Data", "Import surrounding context buildings, roads, terrain"),
-        (4, "Add Buildings — Proposal A", "Model building massing for Proposal A"),
-        (5, "Add Landscaping — Proposal A", "Add green areas, parks, corridors for Proposal A"),
-        (6, "Add Transportation — Proposal A", "Add roads, metro, pedestrian paths for Proposal A"),
-        (7, "Add Buildings — Proposal B", "Model building massing for Proposal B"),
-        (8, "Add Landscaping — Proposal B", "Add green-blue network for Proposal B"),
-        (9, "Add Transportation — Proposal B", "Add mobility corridors for Proposal B"),
-        (10, "Run All 8 Forma Analyses", "Area Metrics, Carbon, Sun Hours, Daylight, Wind, Microclimate, Noise, Solar"),
-        (11, "Forma Board Comparison", "Create Forma Board with both proposals and analysis results"),
-        (12, "Export for Revit", "Export selected office building massing to Revit"),
+        (4, "Add Buildings — Option A", "Model building massing for Design Option A"),
+        (5, "Add Landscaping — Option A", "Add green areas, parks, corridors for Design Option A"),
+        (6, "Add Transportation — Option A", "Add roads, transit, pedestrian paths for Design Option A"),
+        (7, "Add Buildings — Option B", "Model building massing for Design Option B"),
+        (8, "Add Landscaping — Option B", "Add green-blue network for Design Option B"),
+        (9, "Add Transportation — Option B", "Add mobility corridors for Design Option B"),
+        (10, "Run Site Analyses", "Area Metrics, Carbon, Sun Hours, Daylight, Wind, Microclimate, Noise, Solar"),
+        (11, "Design Board Comparison", "Create Design Board with both options and analysis results"),
+        (12, "Export for BIM Modeling", "Export selected office building massing for detailed BIM modeling"),
     ]
     for idx, name, desc in forma_steps:
         c.execute("""
             INSERT INTO forma_workflow (id, project_id, step_index, step_name, step_description, status, notes, evidence_path, updated_at)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (f"demo-forma-{idx}", DEMO_PROJECT_ID, idx, name, desc,
-              "complete" if idx <= 3 else "pending", "DEMO", None, ts))
+              "complete" if idx <= 3 else "pending", "", None, ts))
 
     # Revit workflow
     c.execute("""
         INSERT INTO revit_workflow (project_id, building_name, building_role, forma_ref, revit_ref,
             export_status, sync_status, detailing_done, analysis_rerun, notes, updated_at)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    """, (DEMO_PROJECT_ID, "Hinjewadi Innovation Hub (DEMO)",
+    """, (DEMO_PROJECT_ID, "Hinjewadi Innovation Hub",
           "Mixed-use office building at transit node",
           "forma-model-ref-demo", None,
-          "pending", "pending", 0, 0, "DEMO: Complete Revit detailing and sync back.", ts))
+          "pending", "pending", 0, 0, "Complete detailed BIM modeling and performance re-evaluation.", ts))
 
     # Forma Board — 5 frames
     frames = [
         (1, "Site & Problem", "Overview of site location, area, and key local planning challenges."),
-        (2, "Proposal A — Transit-Oriented", "Compact, high-density transit-oriented development concept."),
-        (3, "Proposal B — Green-Blue Resilient", "Moderate density with extensive green-blue infrastructure."),
-        (4, "Head-to-Head Analysis", "Side-by-side comparison of all 8 Forma analyses."),
-        (5, "Final Decision & Rationale", "Selected proposal, key evidence, trade-offs, and planning priorities."),
+        (2, "Design Option A — Transit-Oriented", "Compact, high-density transit-oriented development concept."),
+        (3, "Design Option B — Green-Blue Resilient", "Moderate density with extensive green-blue infrastructure."),
+        (4, "Head-to-Head Analysis", "Side-by-side comparison of site analyses."),
+        (5, "Final Decision & Rationale", "Selected option, key evidence, trade-offs, and planning priorities."),
     ]
     for fidx, ftitle, fdesc in frames:
         c.execute("""
@@ -469,17 +484,17 @@ def seed_demo_project():
                 image_paths, metric_tags, decision_notes, notes, updated_at)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (f"demo-fb-{fidx}", DEMO_PROJECT_ID, fidx, ftitle, fdesc,
-              json.dumps([]), json.dumps([]), None, "DEMO", ts))
+              json.dumps([]), json.dumps([]), None, "", ts))
 
     # Presentation slides — 7
     slides = [
         (1, "Site + Local Problems", "Title, site location map, 3 key problems"),
-        (2, "Smart City Vision + Objectives", "Vision statement and 3 planning objectives with targets"),
-        (3, "Proposal A vs Proposal B", "Concept diagrams and key differentiators"),
-        (4, "Analysis-Driven Comparison", "8 Forma analyses side-by-side"),
-        (5, "Final Proposal + Rationale", "Selected concept with design decisions and evidence"),
-        (6, "Revit Office Building + Sync", "Detailed office building and Forma sync workflow"),
-        (7, "Forma Board + Impact", "Forma Board visuals, impact metrics, and conclusion"),
+        (2, "Vision + Objectives", "Vision statement and 3 planning objectives with targets"),
+        (3, "Option A vs Option B", "Concept diagrams and key differentiators"),
+        (4, "Analysis-Driven Comparison", "Site analyses side-by-side"),
+        (5, "Final Concept + Rationale", "Selected concept with design decisions and evidence"),
+        (6, "Detailed BIM Modeling", "Detailed office building and integration workflow"),
+        (7, "Design Board + Impact", "Design Board visuals, impact metrics, and conclusion"),
     ]
     for sidx, stitle, snotes in slides:
         c.execute("""
@@ -504,7 +519,7 @@ def seed_demo_project():
             VALUES (?, ?, ?, ?, ?)
         """, (DEMO_PROJECT_ID, key,
               "complete" if key in ("site_area", "site_limits", "context") else "pending",
-              "DEMO", ts))
+              "", ts))
 
     conn.commit()
     conn.close()

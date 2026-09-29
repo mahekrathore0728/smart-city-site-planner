@@ -1,0 +1,346 @@
+/* ============================================================
+   UrbanPlan Authentication Styling
+   Cinematic Split-View Composition matching Home Reference
+   ============================================================ */
+
+.auth-page {
+  position: relative;
+  min-height: 100vh;
+  background-color: #070A0F;
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Integrated Aerial Masterplan Visual Backdrop */
+.auth-bg-visual {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.auth-masterplan-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: right top;
+  filter: brightness(0.65) contrast(1.15);
+}
+
+.auth-masterplan-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.auth-bg-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background: 
+    linear-gradient(to right, rgba(7, 10, 15, 0.94) 0%, rgba(7, 10, 15, 0.75) 50%, rgba(7, 10, 15, 0.85) 100%),
+    radial-gradient(circle at 65% 25%, rgba(62, 123, 255, 0.1) 0%, transparent 60%);
+}
+
+/* Minimal Header Bar */
+.auth-header-bar {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 32px;
+  width: 100%;
+  max-width: 1160px;
+  margin: 0 auto;
+}
+
+.auth-brand-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--text-primary);
+  text-decoration: none;
+  letter-spacing: -0.01em;
+}
+
+.auth-logo-badge {
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  background-color: #3E7BFF;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-decoration: none;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  border: 1px solid var(--border);
+  background-color: rgba(17, 23, 33, 0.7);
+  transition: all 0.15s ease;
+}
+
+.auth-back-link:hover {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border-color: #3E7BFF;
+}
+
+/* Main Split Grid Container */
+.auth-split-container {
+  position: relative;
+  z-index: 10;
+  flex: 1;
+  max-width: 1160px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 32px 48px 32px;
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 64px;
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  .auth-split-container {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+}
+
+/* Left Column: Urban Planning Hero Branding */
+.auth-left-hero {
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--text-tertiary);
+  margin-bottom: 14px;
+}
+
+.auth-hero-headline {
+  font-size: 42px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  margin-bottom: 18px;
+}
+
+.auth-hero-desc {
+  font-size: 15px;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  max-width: 440px;
+  margin-bottom: 32px;
+}
+
+.auth-hero-pillars {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.hero-pillar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.pillar-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #3E7BFF;
+}
+
+/* Right Column: Compact Auth Panel Card */
+.auth-right-panel {
+  display: flex;
+  justify-content: flex-end;
+}
+
+@media (max-width: 900px) {
+  .auth-right-panel {
+    justify-content: center;
+  }
+}
+
+.auth-card {
+  width: 100%;
+  background-color: #111721;
+  border: 1px solid #27313C;
+  border-radius: 12px;
+  padding: 36px 32px;
+  box-shadow: 0 24px 56px rgba(0, 0, 0, 0.65);
+}
+
+.auth-card-header {
+  margin-bottom: 24px;
+}
+
+.auth-card-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+  letter-spacing: -0.015em;
+}
+
+.auth-card-subtitle {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+/* Form Controls */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.auth-field-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.auth-field-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.auth-forgot-btn {
+  background: none;
+  border: none;
+  color: #6B9CFF;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+}
+
+.auth-forgot-btn:hover {
+  text-decoration: underline;
+}
+
+.auth-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.auth-input {
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;
+  background-color: #0B0E14;
+  border: 1px solid #27313C;
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 13px;
+  transition: border-color 0.15s ease;
+}
+
+.auth-input::placeholder {
+  color: var(--text-disabled);
+}
+
+.auth-input:focus {
+  outline: none;
+  border-color: #3E7BFF;
+}
+
+.auth-input-has-toggle {
+  padding-right: 36px;
+}
+
+.auth-password-toggle {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+}
+
+.auth-password-toggle:hover {
+  color: var(--text-secondary);
+}
+
+.auth-submit-pill {
+  width: 100%;
+  height: 42px;
+  margin-top: 6px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Card Footer */
+.auth-card-footer {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.auth-link {
+  color: #6B9CFF;
+  font-weight: 600;
+  text-decoration: none;
+  margin-left: 4px;
+}
+
+.auth-link:hover {
+  text-decoration: underline;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 480px) {
+  .auth-header-bar {
+    padding: 16px 20px;
+  }
+  .auth-card {
+    padding: 28px 20px;
+    border-radius: 10px;
+  }
+}

@@ -8,6 +8,7 @@ from flask import Flask, send_from_directory, jsonify, request
 from flask_cors import CORS
 from database import init_db, seed_demo_project
 
+from routes.auth import auth_bp
 from routes.projects import projects_bp
 from routes.site import site_bp
 from routes.problems import problems_bp
@@ -39,6 +40,7 @@ def create_app():
     seed_demo_project()
 
     # Register blueprints
+    app.register_blueprint(auth_bp)
     app.register_blueprint(projects_bp)
     app.register_blueprint(site_bp)
     app.register_blueprint(problems_bp)

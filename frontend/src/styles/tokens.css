@@ -1,63 +1,82 @@
 /* ============================================================
-   SMART CITY SITE PLANNER — Design Tokens
-   Premium SaaS × Urban Planning Studio × GIS Workspace
+   URBANPLAN PLATFORM — Design Tokens
+   Dark Charcoal × Muted Sage Studio Palette
    ============================================================ */
 
 :root {
   /* ── Backgrounds ── */
-  --bg-base: #F7F7F5;
-  --bg-panel: #FFFFFF;
-  --bg-nav: #111111;
-  --bg-nav-hover: #1C1C1C;
-  --bg-nav-active: rgba(37, 99, 235, 0.15);
-  --bg-muted: #F2F2EF;
-  --bg-subtle: #FAFAF8;
-  --bg-overlay: rgba(17, 17, 17, 0.5);
+  --bg-base: #0B0F14;
+  --bg-secondary: #111821;
+  --bg-panel: #151D26;
+  --bg-card: #151D26;
+  --bg-nav: #111821;
+  --bg-nav-hover: #192330;
+  --bg-nav-active: rgba(62, 123, 255, 0.15);
+  --bg-muted: #1A232E;
+  --bg-subtle: #131A24;
+  --bg-overlay: rgba(0, 0, 0, 0.75);
 
   /* ── Text ── */
-  --text-primary: #111111;
-  --text-secondary: #6B6B6B;
-  --text-tertiary: #9B9B9B;
-  --text-disabled: #C4C4C0;
-  --text-nav: #E5E5E5;
-  --text-nav-muted: #888888;
+  --text-primary: #F2F4F7;
+  --text-secondary: #9AA5B1;
+  --text-tertiary: #6B7A8D;
+  --text-disabled: #465466;
+  --text-nav: #F2F4F7;
+  --text-nav-muted: #9AA5B1;
   --text-inverse: #FFFFFF;
-  --text-link: #2563EB;
+  --text-link: #6B9CFF;
 
   /* ── Borders ── */
-  --border: #E7E7E4;
-  --border-strong: #D0D0CC;
-  --border-focus: #2563EB;
-  --border-nav: rgba(255,255,255,0.08);
+  --border: #27313C;
+  --border-strong: #384656;
+  --border-focus: #3E7BFF;
+  --border-nav: rgba(255, 255, 255, 0.08);
 
-  /* ── Accents ── */
-  --blue: #2563EB;
-  --blue-light: #EFF6FF;
-  --blue-dark: #1D4ED8;
-  --green: #10B981;
-  --green-light: #ECFDF5;
-  --green-dark: #059669;
-  --amber: #F59E0B;
-  --amber-light: #FFFBEB;
-  --red: #EF4444;
-  --red-light: #FEF2F2;
-  --purple: #7C3AED;
-  --purple-light: #F5F3FF;
-  --teal: #0D9488;
-  --teal-light: #F0FDFA;
+  /* ── Accents (Muted Professional Blue System) ── */
+  --primary-accent: #3E7BFF;
+  --secondary-accent: #6B9CFF;
+
+  --sage: #3E7BFF;
+  --sage-light: #6B9CFF;
+  --sage-dark: #2A5BCC;
+  --sage-subtle: rgba(62, 123, 255, 0.15);
+
+  --gold: #C2A878;
+  --gold-light: rgba(194, 168, 120, 0.15);
+
+  /* Primary Blue Accent System */
+  --blue: #3E7BFF;
+  --blue-light: rgba(62, 123, 255, 0.15);
+  --blue-dark: #2A5BCC;
+
+  --green: #A8C7A1;
+  --green-light: rgba(168, 199, 161, 0.15);
+  --green-dark: #7A9A78;
+
+  --amber: #C2A878;
+  --amber-light: rgba(194, 168, 120, 0.15);
+
+  --red: #D96B66;
+  --red-light: rgba(217, 107, 102, 0.15);
+
+  --purple: #9080A8;
+  --purple-light: rgba(144, 128, 168, 0.15);
+
+  --teal: #689F95;
+  --teal-light: rgba(104, 159, 149, 0.15);
 
   /* ── Status / Semantic ── */
   --status-complete: var(--green);
-  --status-in-progress: var(--blue);
+  --status-in-progress: var(--sage-light);
   --status-pending: var(--text-tertiary);
   --status-warning: var(--amber);
   --status-critical: var(--red);
 
   /* ── Analysis status colors ── */
-  --analysis-not-started: #9B9B9B;
-  --analysis-evidence-required: #F59E0B;
-  --analysis-uploaded: #2563EB;
-  --analysis-reviewed: #10B981;
+  --analysis-not-started: #757D77;
+  --analysis-evidence-required: #C2A878;
+  --analysis-uploaded: #7A9A78;
+  --analysis-reviewed: #A8C7A1;
 
   /* ── Spacing ── */
   --space-1: 4px;
@@ -112,17 +131,17 @@
   --radius-xl: 12px;
   --radius-full: 9999px;
 
-  /* ── Shadows ── */
-  --shadow-xs: 0 1px 2px rgba(0,0,0,0.05);
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-md: 0 2px 6px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-lg: 0 4px 16px rgba(0,0,0,0.10), 0 2px 4px rgba(0,0,0,0.05);
-  --shadow-xl: 0 8px 32px rgba(0,0,0,0.12), 0 4px 8px rgba(0,0,0,0.06);
+  /* ── Shadows (Restrained Dark Studio Elevation) ── */
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.2);
+  --shadow-md: 0 2px 6px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.2);
+  --shadow-lg: 0 4px 16px rgba(0,0,0,0.5), 0 2px 4px rgba(0,0,0,0.3);
+  --shadow-xl: 0 8px 32px rgba(0,0,0,0.6), 0 4px 8px rgba(0,0,0,0.4);
 
   /* ── Layout ── */
-  --sidebar-width: 240px;
+  --sidebar-width: 250px;
   --topbar-height: 56px;
-  --content-max: 1200px;
+  --content-max: 1240px;
 
   /* ── Transitions ── */
   --transition-fast: 120ms ease;
